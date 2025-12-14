@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Chinese Anime 3D</title>
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TIDAK ADA SCRIPT IKLAN DISINI -->
+
+    <style>
+        body { background-color: #0f172a; color: #cbd5e1; }
+        .hide { display: none !important; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .day-select-btn { background-color: #1e293b; border: 1px solid #475569; color: #94a3b8; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: all 0.2s; user-select: none; }
+        .day-select-btn.selected { background-color: #2563eb; color: white; border-color: #3b82f6; }
+        input[type="datetime-local"] { color-scheme: dark; cursor: pointer; }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex flex-col items-center">
+
+    <!-- LOGIN ADMIN -->
+    <div id="view-admin-login" class="flex justify-center items-center h-[80vh] w-full">
+        <div class="bg-slate-800 p-8 rounded shadow-lg border border-slate-700 text-center w-full max-w-sm">
+            <h2 class="font-bold text-red-500 mb-6 text-xl">Admin Access</h2>
+            <form onsubmit="event.preventDefault(); adminLogin();">
+                <input type="text" id="admin-user" placeholder="User" autocomplete="username" class="block w-full mb-3 p-3 bg-slate-900 rounded border border-slate-600 text-white text-sm">
+                <input type="password" id="admin-pass" placeholder="Pass" autocomplete="current-password" class="block w-full mb-6 p-3 bg-slate-900 rounded border border-slate-600 text-white text-sm">
+                <button class="bg-red-600 px-4 py-3 rounded text-white font-bold w-full hover:bg-red-500 transition">Login</button>
+            </form>
+            <p id="admin-msg" class="text-sm text-red-400 mt-4"></p>
+        </div>
+    </div>
+
+    <!-- PANEL ADMIN -->
+    <div id="view-admin-panel" class="hide w-full max-w-4xl pb-20">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-white">Dashboard Admin</h1>
+            <button onclick="adminLogout()" class="bg-red-900 text-red-200 px-4 py-2 rounded text-xs border border-red-700">Logout</button>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-lg mb-4 border border-slate-700">
+            <h3 class="font-bold text-red-400 mb-3 text-xs uppercase tracking-wider border-b border-slate-700 pb-2">Akun Admin</h3>
+            <div class="flex gap-2"><input type="text" id="admin-edit-user" placeholder="Username Baru" class="bg-slate-900 p-2 rounded text-xs text-white border border-slate-600 flex-1"><input type="password" id="admin-edit-pass" placeholder="Password Baru" class="bg-slate-900 p-2 rounded text-xs text-white border border-slate-600 flex-1"><button onclick="updateAdminCredentials()" class="bg-red-700 text-white px-3 py-2 rounded text-xs font-bold">Simpan</button></div>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-lg mb-4 border border-slate-700">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                <h3 class="font-bold text-blue-400 text-xs uppercase tracking-wider">Input Donghua</h3>
+                <button onclick="downloadSitemap()" class="bg-yellow-600 text-white text-[10px] px-2 py-1 rounded">📥 Sitemap</button>
+            </div>
+            <input type="hidden" id="edit-id">
+            <div class="space-y-2 mb-2">
+                <input type="text" id="inp-title" placeholder="Judul Anime" class="w-full p-2 bg-slate-900 rounded border border-slate-600 text-xs text-white">
+                <input type="text" id="inp-img" placeholder="Poster URL (https://...)" class="w-full p-2 bg-slate-900 rounded border border-slate-600 text-xs text-white">
+                <textarea id="inp-desc" placeholder="Sinopsis..." class="w-full p-2 bg-slate-900 rounded border border-slate-600 text-xs text-white" rows="2"></textarea>
+                <textarea id="inp-notify-msg" placeholder="Pesan Telegram (Optional)" class="w-full p-2 bg-slate-900 rounded border border-slate-600 text-xs text-white mt-2" rows="2"></textarea>
+            </div>
+            <div class="mb-3 bg-slate-900 p-3 rounded border border-slate-700">
+                <div class="mb-3">
+                    <label class="text-[10px] text-gray-400 block mb-1 uppercase font-bold">Hari Tayang</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="toggleDaySelection(this)" data-val="Senin" class="day-select-btn">Senin</button><button type="button" onclick="toggleDaySelection(this)" data-val="Selasa" class="day-select-btn">Selasa</button><button type="button" onclick="toggleDaySelection(this)" data-val="Rabu" class="day-select-btn">Rabu</button><button type="button" onclick="toggleDaySelection(this)" data-val="Kamis" class="day-select-btn">Kamis</button><button type="button" onclick="toggleDaySelection(this)" data-val="Jumat" class="day-select-btn">Jumat</button><button type="button" onclick="toggleDaySelection(this)" data-val="Sabtu" class="day-select-btn">Sabtu</button><button type="button" onclick="toggleDaySelection(this)" data-val="Minggu" class="day-select-btn">Minggu</button><button type="button" onclick="toggleDaySelection(this)" data-val="Random" class="day-select-btn">Random</button>
+                    </div>
+                    <input type="hidden" id="inp-day">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1 uppercase font-bold">⏳ Auto Publish</label>
+                    <div class="flex gap-2"><input type="datetime-local" id="inp-schedule-time" class="flex-1 p-2 bg-slate-800 rounded border border-slate-600 text-xs text-white"><button type="button" onclick="document.getElementById('inp-schedule-time').value = ''" class="bg-slate-700 text-gray-300 px-3 rounded border border-slate-600 text-xs">Reset</button></div>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-2 rounded border border-slate-700 mb-2">
+                <div class="flex justify-between mb-2"><span class="text-[10px] text-gray-400">List Episode</span><button type="button" onclick="addEpisodeRow()" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded">+ Tambah</button></div>
+                <div id="episode-container" class="max-h-40 overflow-y-auto space-y-1 pr-1 custom-scroll"></div>
+            </div>
+            <div class="flex gap-2"><button onclick="saveDonghua()" class="flex-1 bg-green-600 py-2 rounded font-bold text-white text-xs hover:bg-green-500">SIMPAN DATA</button><button onclick="clearForm()" class="bg-gray-600 px-4 py-2 rounded font-bold text-white text-xs hover:bg-gray-500">RESET</button></div>
+        </div>
+
+        <div class="overflow-x-auto bg-slate-800 rounded-lg border border-slate-700">
+            <table class="w-full text-left text-xs text-gray-400">
+                <thead class="bg-slate-700 text-white font-bold"><tr><th class="p-2">Poster</th><th class="p-2">Info</th><th class="p-2 text-right">Aksi</th></tr></thead>
+                <tbody id="admin-list" class="divide-y divide-slate-700"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- REAUTH MODAL -->
+    <div id="reauth-modal" class="hide fixed inset-0 bg-slate-900/80 z-[70] flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-slate-800 w-full max-w-sm rounded-xl p-6 border border-slate-700 shadow-2xl">
+            <h3 class="font-bold text-white text-lg mb-2">Sesi Admin Berakhir</h3>
+            <form onsubmit="event.preventDefault(); handleReauth();" class="space-y-3">
+                <input type="password" id="reauth-pass" placeholder="Password Admin" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs">
+                <p id="reauth-msg" class="text-red-400 text-xs h-4"></p>
+                <div class="flex gap-2"><button type="button" onclick="adminLogout()" class="flex-1 bg-slate-600 py-2.5 rounded-lg font-bold text-white text-xs">Logout</button><button type="submit" class="flex-1 bg-blue-600 py-2.5 rounded-lg font-bold text-white text-xs">Lanjutkan</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = { workerUrl: "https://backup3d.ruslirusli123091.workers.dev" };
+        let appData = { donghua: [] }; let isAdminLoggedIn = false; let onReauthSuccess = null;
+
+        async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+        async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+        function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
+
+        window.addEventListener('load', () => {
+            if (sessionStorage.getItem('admin_session') === 'active') { isAdminLoggedIn = true; document.getElementById('view-admin-login').classList.add('hide'); document.getElementById('view-admin-panel').classList.remove('hide'); fetchContent(); }
+        });
+
+        async function fetchContent() {
+            try {
+                const headers = {};
+                const adminPass = sessionStorage.getItem('admin_secret_temp');
+                if (adminPass) headers['X-Admin-Pass'] = adminPass;
+                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { headers: headers });
+                const j = await r.json();
+                appData.donghua = j.donghua || [];
+                renderAdminList();
+            } catch (e) { console.error("Error", e); }
+        }
+
+        async function adminLogin() {
+            const u = document.getElementById('admin-user').value.trim(); const p = document.getElementById('admin-pass').value.trim();
+            const msg = document.getElementById('admin-msg'); msg.innerText = "Verifikasi...";
+            const hashedUser = await hashString(u); const hashedPass = await hashPass(p);
+            try {
+                const r = await fetch(`${CONFIG.workerUrl}/api/auth`); const j = await r.json(); const users = j.users || j.admin || [];
+                const found = users.find(x => x.username === hashedUser && x.password === hashedPass);
+                if (found) {
+                    isAdminLoggedIn = true; sessionStorage.setItem('admin_session', 'active'); sessionStorage.setItem('admin_secret_temp', p);
+                    document.getElementById('view-admin-login').classList.add('hide'); document.getElementById('view-admin-panel').classList.remove('hide');
+                    fetchContent();
+                } else { msg.innerText = "Login Gagal!"; }
+            } catch (e) { msg.innerText = "Error Worker"; }
+        }
+
+        function adminLogout() { isAdminLoggedIn = false; sessionStorage.clear(); location.reload(); }
+
+        function renderAdminList() {
+            const t = document.getElementById('admin-list'); t.innerHTML = "";
+            appData.donghua.forEach(i => {
+                const isScheduled = i.scheduledTime && i.scheduledTime > Date.now();
+                const statusBadge = isScheduled ? '<span class="text-[9px] bg-yellow-600 text-white px-1 rounded ml-1">⏳ Wait</span>' : '';
+                t.innerHTML += `<tr class="border-b border-slate-700"><td class="p-2 w-10"><img src="${i.image}" alt="${i.title}" class="w-6 h-8 bg-black object-cover rounded"></td><td class="p-2 text-white truncate max-w-[120px]"><div class="font-bold text-[10px]">${i.title} ${statusBadge}</div><div class="text-[9px] text-gray-500">${i.day || '-'}</div></td><td class="p-2 text-right"><button onclick="editData('${i.id}')" class="text-blue-400 mr-2 text-[10px]">EDIT</button><button onclick="deleteData('${i.id}')" class="text-red-400 text-[10px]">DEL</button></td></tr>`;
+            });
+        }
+
+        // --- CRUD Logic ---
+        function toggleDaySelection(btn) { btn.classList.toggle('selected'); updateHiddenDayInput(); }
+        function updateHiddenDayInput() { const selected = []; document.querySelectorAll('.day-select-btn.selected').forEach(btn => selected.push(btn.getAttribute('data-val'))); document.getElementById('inp-day').value = selected.join(','); }
+        function addEpisodeRow(n = "", u = "") { const c = document.getElementById('episode-container'); const d = document.createElement('div'); d.className = "ep-row flex gap-1 items-center bg-slate-900 p-1 rounded border border-slate-700 mb-1"; d.innerHTML = `<div class="flex flex-col gap-0.5 mr-1"><button type="button" onclick="moveEpRow(this, -1)" class="text-gray-500 hover:text-blue-400 leading-none text-[8px] p-0.5">▲</button><button type="button" onclick="moveEpRow(this, 1)" class="text-gray-500 hover:text-blue-400 leading-none text-[8px] p-0.5">▼</button></div><input value="${n}" class="w-8 bg-slate-800 border border-slate-600 text-[10px] p-1 text-center ep-num text-white rounded" placeholder="#"><input value="${u}" class="flex-1 bg-slate-800 border border-slate-600 text-[10px] p-1 ep-url text-white rounded" placeholder="URL"><button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-300 px-2 font-bold leading-none">×</button>`; c.appendChild(d); }
+        function moveEpRow(btn, direction) { const row = btn.closest('.ep-row'); const container = row.parentNode; if (direction === -1 && row.previousElementSibling) { container.insertBefore(row, row.previousElementSibling); } else if (direction === 1 && row.nextElementSibling) { container.insertBefore(row.nextElementSibling, row); } }
+        function clearForm() { document.getElementById('edit-id').value = ""; document.getElementById('inp-title').value = ""; document.getElementById('inp-img').value = ""; document.getElementById('inp-desc').value = ""; document.getElementById('inp-notify-msg').value = ""; document.getElementById('inp-day').value = ""; document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); document.getElementById('inp-schedule-time').value = ""; document.getElementById('episode-container').innerHTML = ""; }
+        
+        function editData(id) { const i = appData.donghua.find(x => x.id == id); if (!i) return; document.getElementById('edit-id').value = i.id; document.getElementById('inp-title').value = i.title; document.getElementById('inp-img').value = i.image; document.getElementById('inp-desc').value = i.synopsis; document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); if (i.day) { const savedDays = i.day.split(','); savedDays.forEach(d => { const btn = document.querySelector(`.day-select-btn[data-val="${d}"]`); if (btn) btn.classList.add('selected'); }); document.getElementById('inp-day').value = i.day; } else { document.getElementById('inp-day').value = ""; } if (i.scheduledTime) { const d = new Date(i.scheduledTime); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); document.getElementById('inp-schedule-time').value = d.toISOString().slice(0, 16); } else { document.getElementById('inp-schedule-time').value = ""; } const c = document.getElementById('episode-container'); c.innerHTML = ""; (i.episodes || []).forEach(e => addEpisodeRow(e.ep, e.url)); window.scrollTo(0, 0); }
+        
+        async function saveDonghua() {
+            const secretPass = sessionStorage.getItem('admin_secret_temp');
+            if (!secretPass) return showReauthPopup(() => saveDonghua());
+            const id = document.getElementById('edit-id').value; const title = document.getElementById('inp-title').value; const img = document.getElementById('inp-img').value; const desc = document.getElementById('inp-desc').value; const customMsg = document.getElementById('inp-notify-msg').value;
+            updateHiddenDayInput(); const day = document.getElementById('inp-day').value; const scheduleInput = document.getElementById('inp-schedule-time').value; const scheduledTime = scheduleInput ? new Date(scheduleInput).getTime() : null;
+            let eps = []; document.querySelectorAll('#episode-container > div').forEach(r => { eps.push({ ep: r.querySelector('.ep-num').value, url: r.querySelector('.ep-url').value }) });
+            const ts = Date.now(); const isNewEntry = !id; const newItemId = id || ts.toString();
+            let newItem = { id: newItemId, title, image: img, synopsis: desc, day: day, scheduledTime: scheduledTime, episodes: eps, views: 0, lastUpdated: ts };
+            const idx = appData.donghua.findIndex(x => x.id == id);
+            if (idx > -1) { newItem.views = appData.donghua[idx].views || 0; if (!scheduledTime && appData.donghua[idx].scheduledTime) newItem.scheduledTime = appData.donghua[idx].scheduledTime; appData.donghua[idx] = newItem; } else { appData.donghua.push(newItem); }
+            try {
+                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ donghua: appData.donghua }) });
+                if (r.ok) { alert("Tersimpan!"); if (!scheduledTime || scheduledTime <= Date.now()) { const notificationData = { title: newItem.title, image: newItem.image, url: `${window.location.origin}/?page=synopsis&id=${newItemId}`, status: isNewEntry ? 'new' : 'update', latestEp: getLatestEp(newItem.episodes), customMessage: customMsg }; fetch(`${CONFIG.workerUrl}/api/notify`, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify(notificationData) }).catch(err => console.error("Notif fail", err)); } clearForm(); renderAdminList(); }
+                else if (r.status === 401) { showReauthPopup(() => saveDonghua()); } else { alert("Gagal menyimpan"); }
+            } catch (e) { alert("Error Worker"); }
+        }
+
+        async function deleteData(id) {
+            const secretPass = sessionStorage.getItem('admin_secret_temp');
+            if (!secretPass) return showReauthPopup(() => deleteData(id));
+            if (confirm("Hapus?")) {
+                const originalData = [...appData.donghua]; appData.donghua = appData.donghua.filter(x => x.id != id);
+                try {
+                    const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ donghua: appData.donghua }) });
+                    if (r.ok) { renderAdminList(); } else if (r.status === 401) { appData.donghua = originalData; showReauthPopup(() => deleteData(id)); } else { alert("Gagal menghapus."); appData.donghua = originalData; }
+                } catch (e) { alert("Error"); appData.donghua = originalData; }
+            }
+        }
+        
+        async function updateAdminCredentials() {
+            const secretPass = sessionStorage.getItem('admin_secret_temp');
+            if (!secretPass) return showReauthPopup(() => updateAdminCredentials());
+            const newUser = document.getElementById('admin-edit-user').value.trim(); const newPass = document.getElementById('admin-edit-pass').value.trim();
+            if (!newUser || !newPass) return alert("Isi lengkap!");
+            if (!confirm("Yakin?")) return;
+            const hashedNewUser = await hashString(newUser); const hashedNewPass = await hashPass(newPass);
+            try {
+                const r_auth = await fetch(`${CONFIG.workerUrl}/api/auth`); const j = await r_auth.json(); const users = j.users || j.admin || [];
+                const hashedCurrentPass = await hashPass(secretPass); const idx = users.findIndex(u => u.password === hashedCurrentPass);
+                if (idx > -1) { users[idx].username = hashedNewUser; users[idx].password = hashedNewPass; const r_put = await fetch(`${CONFIG.workerUrl}/api/auth`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ users: users }) }); if (r_put.ok) { alert("Login ulang."); adminLogout(); } else { alert("Gagal."); } } else { alert("Error"); }
+            } catch (e) { alert("Error Worker"); }
+        }
+
+        function showReauthPopup(callback) { onReauthSuccess = callback; document.getElementById('reauth-msg').innerText = ''; document.getElementById('reauth-modal').classList.remove('hide'); document.getElementById('reauth-pass').focus(); }
+        async function handleReauth() { const pass = document.getElementById('reauth-pass').value; if (!pass) return; try { const r = await fetch(`${CONFIG.workerUrl}/api/verify-session`, { method: 'POST', headers: { 'X-Admin-Pass': pass } }); if (r.ok) { sessionStorage.setItem('admin_secret_temp', pass); document.getElementById('reauth-modal').classList.add('hide'); if (onReauthSuccess) { onReauthSuccess(); onReauthSuccess = null; } } else { document.getElementById('reauth-msg').innerText = 'Salah'; } } catch (e) { } }
+        
+        function downloadSitemap() { alert("Gunakan fitur di index untuk download sitemap publik."); }
+    </script>
+</body>
+</html>
