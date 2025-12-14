@@ -96,7 +96,7 @@
             opacity: 1;
         }
     </style>
-    <script type="text/javascript" src="https://pl28253644.effectivegatecpm.com/45/a0/58/45a058537afdc6637f4b27d76241566d.js" ></script>
+    <!-- SCRIPT IKLAN SUDAH DIHAPUS DARI SINI AGAR BISA DIKONTROL VIA JS -->
 </head>
 <body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none"> 
 
@@ -258,6 +258,29 @@
 
     <script>
         const CONFIG = { workerUrl: "https://ds.yijedok676-351.workers.dev" }; 
+        
+        // --- FUNGSI LOAD IKLAN DINAMIS ---
+        function manageAds() {
+            // Cek apakah URL mengandung '/admin'
+            if (window.location.hash.includes('/admin')) {
+                console.log("Admin Mode: Iklan tidak dimuat.");
+                return; // Jangan lanjut, jangan pasang iklan
+            }
+
+            // Cek agar tidak pasang iklan double
+            if (document.getElementById('ads-script-unique')) return;
+
+            // Buat element script iklan
+            const adScript = document.createElement('script');
+            adScript.id = 'ads-script-unique';
+            adScript.type = 'text/javascript';
+            adScript.src = "https://pl28253644.effectivegatecpm.com/45/a0/58/45a058537afdc6637f4b27d76241566d.js";
+            
+            // Masukkan ke HEAD
+            document.head.appendChild(adScript);
+        }
+        // ---------------------------------
+
         let appData = { donghua: [] }, chatData = { comments: [] }, currentUser = null, currentUserNameDisplay = "", isAdminLoggedIn = false;
         let currentPage = 1; const ITEMS_PER_PAGE = 18;
         let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
@@ -269,6 +292,9 @@
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
 
         window.addEventListener('load', async () => {
+            // PANGGIL FUNGSI IKLAN SAAT WEB LOAD
+            manageAds();
+
             if (sessionStorage.getItem('admin_session') === 'active') isAdminLoggedIn = true;
             const savedUser = localStorage.getItem('user_session');
             if (savedUser) { try { currentUser = JSON.parse(savedUser); currentUserNameDisplay = localStorage.getItem('user_name_display') || "Member"; } catch (e) { currentUser = null; } }
