@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://ds.yijedok676-351.workers.dev/sitemap.xml
+
+Sitemap: https://backup3d.ruslirusli123091.workers.dev/sitemap.xml
