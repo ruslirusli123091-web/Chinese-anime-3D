@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
     {
       "src": "https://ca3d.site/web-app-manifest-192x192.png",
@@ -22,3 +22,4 @@
     }
   ]
 }
+
