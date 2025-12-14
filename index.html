@@ -7,7 +7,7 @@
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia. Update setiap hari, gratis.">
     <meta name="theme-color" content="#0f172a">
     
-    <!-- PRECONNECT (Mempercepat Koneksi ke CDN & API) -->
+    <!-- PRECONNECT -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://backup3d.ruslirusli123091.workers.dev">
     
@@ -47,7 +47,7 @@
         .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
         @media (min-width: 1024px) { .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; } .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; } }
         
-        /* BUTTONS (ACCESSIBILITY FIX: Min Size 44px for Touch) */
+        /* BUTTONS */
         .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; min-width: 40px; min-height: 40px; }
         .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
         .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
@@ -60,7 +60,7 @@
         .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
         .banner-slide.active { opacity: 1; pointer-events: auto; z-index: 10; }
         .banner-overlay { background: linear-gradient(to top, #0f172a 10%, transparent 90%); }
-        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; width: 8px; height: 8px; } /* Touch target fix */
+        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; width: 8px; height: 8px; }
         .dot.active { background-color: #3b82f6; transform: scale(1.5); opacity: 1; }
         
         /* CHAT */
@@ -90,7 +90,6 @@
         
         <!-- HOME PAGE -->
         <div id="view-home" class="hide animate-fade">
-            <!-- LCP OPTIMIZATION: Banner dengan fetchpriority -->
             <div id="hero-banner-container" class="hide mb-6 w-full rounded-2xl overflow-hidden relative shadow-2xl border border-slate-800 bg-slate-900 aspect-[16/9] sm:h-80 group">
                 <div id="banner-wrapper" class="w-full h-full relative"></div>
                 <div id="banner-dots" class="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20"></div>
@@ -113,33 +112,55 @@
             <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
 
-        <!-- AUTH PAGE -->
+        <!-- AUTH PAGE (WITH PASSWORD TOGGLE) -->
         <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
             <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
                 <div class="flex mb-6 border-b border-slate-700" role="tablist">
                     <button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-3 text-center font-bold text-white border-b-2 border-blue-500" role="tab" aria-selected="true">Masuk</button>
                     <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-3 text-center font-bold text-gray-400" role="tab" aria-selected="false">Daftar</button>
                 </div>
+                
+                <!-- LOGIN FORM -->
                 <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                     <label for="login-user" class="sr-only">Username</label>
                     <input type="text" id="login-user" placeholder="Username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
-                    <label for="login-pass" class="sr-only">Password</label>
-                    <input type="password" id="login-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
+                    
+                    <!-- PASSWORD FIELD WITH TOGGLE -->
+                    <div class="relative">
+                        <label for="login-pass" class="sr-only">Password</label>
+                        <input type="password" id="login-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
+                        <button type="button" onclick="togglePass('login-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <!-- Eye Icon -->
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+
                     <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500 min-h-[44px]">Masuk</button>
                 </form>
+                
+                <!-- REGISTER FORM -->
                 <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide">
                     <label for="reg-user" class="sr-only">Username Baru</label>
                     <input type="text" id="reg-user" placeholder="Username Baru" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
-                    <label for="reg-pass" class="sr-only">Password</label>
-                    <input type="password" id="reg-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
+                    
+                    <!-- PASSWORD FIELD WITH TOGGLE -->
+                    <div class="relative">
+                        <label for="reg-pass" class="sr-only">Password</label>
+                        <input type="password" id="reg-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
+                        <button type="button" onclick="togglePass('reg-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+
                     <button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500 min-h-[44px]">Buat Akun</button>
                 </form>
+
                 <p id="auth-msg" class="text-center text-xs mt-4 h-4 text-yellow-400 font-bold" aria-live="polite"></p>
                 <p class="text-center text-[10px] text-gray-400 mt-2 italic">Data Tersimpan Aman di Server.</p>
             </div>
         </div>
 
-        <!-- PROFILE PAGE -->
+        <!-- PROFILE PAGE (WITH PASSWORD TOGGLE) -->
         <div id="view-profile" class="hide">
             <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg">
                 <div class="flex items-center gap-3">
@@ -157,9 +178,21 @@
                 <h3 class="text-sm font-bold text-white mb-3">🔐 Ganti Password</h3>
                 <div class="flex flex-col gap-3">
                     <label for="user-old-pass" class="sr-only">Password Lama</label>
-                    <input type="password" id="user-old-pass" placeholder="Pass Lama" class="bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white">
+                    <div class="relative">
+                         <input type="password" id="user-old-pass" placeholder="Pass Lama" class="w-full bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white pr-10">
+                         <button type="button" onclick="togglePass('user-old-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    
                     <label for="user-new-pass" class="sr-only">Password Baru</label>
-                    <input type="password" id="user-new-pass" placeholder="Pass Baru" class="bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white">
+                    <div class="relative">
+                        <input type="password" id="user-new-pass" placeholder="Pass Baru" class="w-full bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white pr-10">
+                        <button type="button" onclick="togglePass('user-new-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    
                     <button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded text-sm font-bold min-h-[44px]">Simpan</button>
                 </div>
             </div>
@@ -234,7 +267,7 @@
         </div>
     </main>
 
-    <!-- BOTTOM NAV (Improved Touch Targets) -->
+    <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
         <div class="flex justify-around items-center h-16">
             <button onclick="navigateTo('/')" id="nav-home" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition active:scale-95" aria-label="Beranda">
@@ -266,6 +299,20 @@
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
+
+        // TOGGLE PASSWORD FUNCTION
+        function togglePass(id, btn) {
+            const input = document.getElementById(id);
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            if (isPass) {
+                 // Ganti jadi icon Eye Slash (Tutup mata)
+                 btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>`;
+            } else {
+                 // Ganti jadi icon Eye (Buka mata)
+                 btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            }
+        }
 
         // INIT
         window.addEventListener('load', async () => {
@@ -424,7 +471,6 @@
             
             pageData.forEach(i => { 
                 const latestEp = getLatestEp(i.episodes); 
-                // OPTIMASI GAMBAR: Loading Lazy & Explicit Dimensions
                 c.innerHTML += `
                 <a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="relative cursor-pointer active:scale-95 transition-transform group block">
                     <div class="rounded-lg overflow-hidden relative bg-slate-800 shadow-lg border border-slate-700/50 poster-wrapper">
@@ -452,9 +498,7 @@
             currentBannerIndex = 0; wrapper.innerHTML = ""; dots.innerHTML = "";
             sorted.slice(0, 5).forEach((item, index) => {
                 const latestEp = getLatestEp(item.episodes);
-                // OPTIMASI LCP: Banner pertama fetchpriority="high"
                 const fetchPrio = index === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
-                
                 wrapper.innerHTML += `
                 <div class="banner-slide ${index===0?'active':''}">
                     <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${item.image}');"></div>
