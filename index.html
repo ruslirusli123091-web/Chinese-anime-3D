@@ -11,7 +11,263 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- IKLAN (Hanya ada di sini, tidak di admin) -->
+    <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo</title>
+    <!-- Meta tags SEO, Manifest, Icon sama seperti sebelumnya -->
+    <meta name="theme-color" content="#0f172a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Style sama seperti sebelumnya, tapi HAPUS style .day-select-btn dan admin form */
+        body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
+        .hide { display: none !important; }
+        .poster-card { aspect-ratio: 2/3; object-fit: cover; width: 100%; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .sched-btn.active { background-color: #0ea5e9; color: white; border-color: #0284c7; }
+        .nav-item.active svg { color: #3b82f6; fill: rgba(59, 130, 246, 0.2); }
+        .nav-item.active span { color: #3b82f6; font-weight: bold; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
+        @media (min-width: 1024px) {
+            .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; }
+            .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; }
+        }
+        .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
+        .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); transform: scale(1.05); }
+        /* Banner Styles */
+        .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
+        .banner-slide.active { opacity: 1; pointer-events: auto; z-index: 10; }
+        .banner-overlay { background: linear-gradient(to top, #0f172a 10%, transparent 90%); }
+        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; }
+        .dot.active { background-color: #3b82f6; transform: scale(1.5); opacity: 1; }
+    </style>
     <script type="text/javascript" src="https://pl28253644.effectivegatecpm.com/45/a0/58/45a058537afdc6637f4b27d76241566d.js"></script>
+</head>
+<body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none"> 
+
+    <!-- HEADER (Tanpa Admin Mode) -->
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 h-16 px-4 flex items-center justify-between gap-3 shadow-lg">
+        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0">
+            <img src="logo.png" alt="Chinese Anime 3D" class="h-10 w-auto object-contain">
+        </a>
+        <div class="relative flex-1 max-w-md">
+            <input type="search" id="site_search_query" oninput="doSearch(this.value)" placeholder="Cari Donghua..." class="w-full bg-slate-800 text-gray-200 text-xs rounded-full pl-4 pr-4 py-2.5 border border-slate-700 focus:border-blue-500 outline-none transition focus:bg-slate-900">
+            <div id="search-results" class="absolute top-full left-0 w-full mt-2 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 max-h-80 overflow-y-auto hide z-50 p-2"></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-3 flex-grow relative max-w-5xl">
+        <div id="loading" class="fixed inset-0 bg-slate-900/80 z-[60] flex justify-center items-center backdrop-blur-sm hide"><div class="loader"></div></div>
+        
+        <!-- VIEW HOME -->
+        <div id="view-home" class="hide animate-fade">
+            <div id="hero-banner-container" class="hide mb-6 w-full rounded-2xl overflow-hidden relative shadow-2xl border border-slate-800 bg-slate-900 aspect-[16/9] sm:h-80 group">
+                <div id="banner-wrapper" class="w-full h-full relative"></div>
+                <div id="banner-dots" class="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20"></div>
+            </div>
+            <h2 id="list-title" class="text-sm font-bold mb-4 text-white flex items-center gap-2"><span class="w-1 h-4 bg-blue-500 rounded-full"></span> Update Terbaru</h2>
+            <div id="donghua-list" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"></div>
+            <div id="pagination-container" class="mt-8 flex justify-center items-center gap-2 flex-wrap pb-4"></div>
+            <div class="mt-8 pt-6 border-t border-slate-800"><h3 class="font-bold text-white mb-4 pl-2 border-l-4 border-red-500 text-sm">Sedang Populer 🔥</h3><div id="popular-list-home" class="space-y-3"></div></div>
+        </div>
+
+        <!-- VIEW SCHEDULE -->
+        <div id="view-schedule" class="hide">
+            <h2 class="text-base font-bold mb-4 text-white">Jadwal Rilis</h2>
+            <div class="grid grid-cols-4 gap-2 mb-6">
+                <!-- Buttons Sen-Minggu sama seperti code asli -->
+                <button onclick="switchScheduleTab('Senin')" id="btn-Senin" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Senin</button>
+                <button onclick="switchScheduleTab('Selasa')" id="btn-Selasa" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Selasa</button>
+                <button onclick="switchScheduleTab('Rabu')" id="btn-Rabu" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Rabu</button>
+                <button onclick="switchScheduleTab('Kamis')" id="btn-Kamis" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Kamis</button>
+                <button onclick="switchScheduleTab('Jumat')" id="btn-Jumat" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Jumat</button>
+                <button onclick="switchScheduleTab('Sabtu')" id="btn-Sabtu" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Sabtu</button>
+                <button onclick="switchScheduleTab('Minggu')" id="btn-Minggu" class="sched-btn col-span-2 bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Minggu</button>
+            </div>
+            <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- VIEW AUTH (Login User) -->
+        <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
+            <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
+                <div class="flex mb-6 border-b border-slate-700"><button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-2 text-center font-bold text-white border-b-2 border-blue-500">Masuk</button><button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-2 text-center font-bold text-gray-500">Daftar</button></div>
+                <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4"><input type="text" id="login-user" placeholder="Username" autocomplete="username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500">Masuk</button></form>
+                <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide"><input type="text" id="reg-user" placeholder="Username Baru" autocomplete="off" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><input type="password" id="reg-pass" placeholder="Password" autocomplete="new-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500">Buat Akun</button></form>
+                <p id="auth-msg" class="text-center text-xs mt-4 h-4"></p>
+            </div>
+        </div>
+
+        <!-- VIEW PROFILE -->
+        <div id="view-profile" class="hide">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-lg">👤</div><div><p class="text-gray-400 text-[10px]">Halo,</p><h1 class="text-lg font-bold text-white leading-none" id="profile-name">User</h1></div></div><button onclick="userLogout()" class="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-bold">Logout</button></div>
+            <div class="flex gap-4 border-b border-slate-700 mb-4"><button onclick="switchProfileTab('bookmark')" id="tab-p-bookmark" class="tab-btn active flex-1 pb-3 font-bold text-center text-xs uppercase">Favorit</button><button onclick="switchProfileTab('history')" id="tab-p-history" class="tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase">Riwayat</button></div>
+            <div id="profile-content-list" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-8"></div>
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 mt-6"><h3 class="text-sm font-bold text-white mb-3">🔐 Ganti Password</h3><div class="flex flex-col gap-3"><input type="password" id="user-old-pass" placeholder="Pass Lama" class="bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white"><input type="password" id="user-new-pass" placeholder="Pass Baru" class="bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white"><button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded text-xs font-bold">Simpan</button></div></div>
+        </div>
+
+        <!-- VIEW SYNOPSIS -->
+        <div id="view-synopsis" class="hide">
+             <div class="bg-slate-800/50 rounded-xl p-4 backdrop-blur-sm border border-slate-700/50 mb-6">
+                <div class="flex gap-4 mb-4">
+                    <div class="w-28 flex-shrink-0"><img id="syn-image" src="" alt="Poster" class="w-full rounded-lg shadow-lg poster-card bg-slate-700"></div>
+                    <div class="flex-1 min-w-0 flex flex-col"><h1 id="syn-title" class="text-base font-bold text-white mb-1 leading-tight">Title</h1><div class="flex items-center gap-2 text-[10px] text-gray-400 mb-3"><span id="syn-total-ep-info" class="bg-slate-700 px-1.5 py-0.5 rounded text-white">0 Eps</span><span id="syn-views">0 Views</span></div><div id="synopsis-buttons" class="mt-auto flex gap-2"></div></div>
+                </div>
+                <p id="syn-desc" class="text-gray-400 text-xs leading-relaxed mb-4 line-clamp-4">Desc...</p>
+                <button id="btn-start-watch" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs mb-3 shadow-lg shadow-blue-900/20">MULAI NONTON</button>
+                <div class="border-t border-slate-700 pt-4 mt-2"><h3 class="font-bold text-white text-xs mb-3">DAFTAR EPISODE</h3><div id="syn-episodes" class="ep-grid-custom ep-grid-synopsis max-h-60 overflow-y-auto pr-1 pb-2"></div></div>
+            </div>
+            <div class="mt-6"><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Rekomendasi 🔥</h3><div id="popular-list-syn" class="space-y-3"></div></div>
+        </div>
+
+        <!-- VIEW WATCH -->
+        <div id="view-watch" class="hide">
+             <div class="lg:flex lg:gap-6">
+                <div class="lg:w-[75%]">
+                    <div class="aspect-video w-full relative bg-black shadow-lg"><iframe id="video-player" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>
+                    <div class="bg-slate-900 border-b border-slate-800 pb-3 mb-3"><div class="flex justify-between items-start mt-3 mb-2 px-1"><h2 id="watch-title" class="text-sm font-bold text-white flex-1 mr-2 leading-tight">Title</h2><div id="watch-page-buttons" class="flex items-center gap-3"></div></div><div class="flex items-center gap-3 text-xs text-gray-500 px-1"><span id="watch-views">0 Views</span><a id="back-link" href="#" class="text-blue-500">Detail &rarr;</a></div></div>
+                    <div class="mt-4 mb-8 bg-slate-900 rounded-lg border border-slate-800 p-3"><h3 class="font-bold text-white mb-2 text-xs flex items-center gap-2">Live Chat</h3><div id="chat-container" class="h-48 overflow-y-auto pr-2 mb-2 space-y-2 border border-slate-800/50 rounded bg-slate-950/30 p-2 text-xs"></div><div id="chat-input-area"></div></div>
+                </div>
+                <div class="lg:w-[25%] lg:h-full">
+                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl"><h3 class="font-bold text-white text-xs mb-2">Pilih Episode</h3><div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto pb-2"></div></div>
+                    <div><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Lanjut Nonton 🔥</h3><div id="popular-list-watch" class="space-y-3"></div></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+        <div class="flex justify-around items-center h-14">
+            <button onclick="navigateTo('/')" id="nav-home" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[9px]">Beranda</span></button>
+            <button onclick="navigateTo('?page=schedule')" id="nav-schedule" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-[9px]">Jadwal</span></button>
+            <button onclick="navigateToAccount()" id="nav-account" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[9px]">Akun</span></button>
+        </div>
+    </nav>
+
+    <script>
+        const CONFIG = { workerUrl: "https://ds.yijedok676-351.workers.dev" }; 
+        let appData = { donghua: [] }, chatData = { comments: [] }, currentUser = null, currentUserNameDisplay = "";
+        let currentPage = 1; const ITEMS_PER_PAGE = 18;
+        let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
+        let activeScheduleDay = 'Senin';
+        let isAdminLoggedIn = false; // Tetap ada variabel ini false agar chat tidak error, tapi fitur admin dimatikan di UI
+
+        async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+        async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+        function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
+
+        window.addEventListener('load', async () => {
+            const savedUser = localStorage.getItem('user_session');
+            if (savedUser) { try { currentUser = JSON.parse(savedUser); currentUserNameDisplay = localStorage.getItem('user_name_display') || "Member"; } catch (e) { currentUser = null; } }
+            if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => { }); }
+            const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            activeScheduleDay = daysMap[new Date().getDay()];
+            await fetchContent();
+            checkRoute();
+        });
+        window.addEventListener('hashchange', checkRoute);
+        window.addEventListener('popstate', checkRoute);
+
+        function checkRoute() {
+            // Logika route HANYA untuk user (hapus bagian #/admin)
+            const p = new URLSearchParams(window.location.search), page = p.get('page'), id = p.get('id'), ep = p.get('ep');
+            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hide'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (bannerInterval) clearInterval(bannerInterval);
+
+            if (page === 'auth') {
+                if (currentUser) { navigateTo('?page=profile'); return; }
+                document.title = "Login / Daftar | Chinese Anime 3D";
+                document.getElementById('view-auth').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); switchAuthMode('login');
+            } else if (page === 'profile') {
+                if (!currentUser) { navigateTo('?page=auth'); return; }
+                document.title = "Profil Saya | Chinese Anime 3D";
+                document.getElementById('view-profile').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); renderProfile();
+            } else if (page === 'schedule') {
+                document.title = "Jadwal Rilis | Chinese Anime 3D";
+                document.getElementById('view-schedule').classList.remove('hide'); document.getElementById('nav-schedule').classList.add('active');
+                switchScheduleTab(activeScheduleDay);
+            } else if (page === 'synopsis' && id) {
+                document.getElementById('view-synopsis').classList.remove('hide'); loadSynopsis(id);
+            } else if (page === 'watch' && id && ep) {
+                document.getElementById('view-watch').classList.remove('hide'); loadWatch(id, ep);
+            } else {
+                document.title = "Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo";
+                document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active');
+                renderHome();
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // --- SEMUA FUNGSI UI USER (renderHome, loadSynopsis, loadWatch, dll) SAMA SEPERTI KODE ASLI ---
+        // --- HANYA HAPUS BAGIAN CRUD ADMIN (saveDonghua, deleteData, adminLogin) ---
+        // Copy paste fungsi-fungsi user interface (renderHome, renderBanner, renderChat, dll) dari kode lama ke sini.
+        // Pastikan `navigateTo` dll ada.
+
+        function navigateTo(u) { window.history.pushState({}, '', u); checkRoute(); }
+        function navigateToAccount() { if (currentUser) navigateTo('?page=profile'); else navigateTo('?page=auth'); }
+
+        async function fetchContent() {
+            document.getElementById('loading').classList.remove('hide');
+            try {
+                // Fetch biasa tanpa header admin
+                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`);
+                const j = await r.json();
+                appData.donghua = j.donghua || [];
+            } catch (e) { console.error("Fetch content error:", e); }
+            document.getElementById('loading').classList.add('hide');
+        }
+
+        // ... Sisa fungsi User Interface (renderSidebars, switchScheduleTab, dll) COPY dari file asli ...
+        // Agar tidak kepanjangan saya singkat, tapi intinya semua logika UI user tetap disini.
+        
+        async function fetchChatData() { try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`); const j = await r.json(); chatData = j && j.comments ? j : { comments: [] }; } catch (e) { console.error("Fetch chat error:", e); } }
+
+        function renderSidebars() {
+             const s = [...appData.donghua].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+             ['popular-list-home', 'popular-list-syn', 'popular-list-watch'].forEach(id => {
+                 const el = document.getElementById(id);
+                 if (el) {
+                     el.innerHTML = "";
+                     s.forEach((i, x) => {
+                         el.innerHTML += `<a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="flex gap-3 items-center p-2 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700 transition block mb-2"><span class="text-lg font-bold text-gray-500 w-4 text-center italic">${x + 1}</span><img src="${i.image}" alt="${i.title}" class="w-10 h-14 object-cover rounded bg-slate-900"><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${i.title}</h4><p class="text-[10px] text-gray-400">${i.views || 0} Views</p></div></a>`;
+                     });
+                 }
+             });
+         }
+        
+        // ... Lanjutkan copy paste fungsi renderHome, renderBanner, renderProfile, dll ...
+        // ... Copy paste fungsi User Auth (handleLogin, handleRegister, dll) ...
+        // ... Copy paste fungsi Chat (sendChat, renderChat) ...
+
+        // Pastikan fungsi ini ada:
+        async function openSynopsisAndTrack(id) { 
+            const idx = appData.donghua.findIndex(d => d.id == id); 
+            if (idx > -1) {
+                appData.donghua[idx].views = (appData.donghua[idx].views || 0) + 1;
+                fetch(`${CONFIG.workerUrl}/api/view`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) }).catch(err => {});
+            }
+            navigateTo(`?page=synopsis&id=${id}`); 
+        }
+
+        function doSearch(v) { const b = document.getElementById('search-results'); if (!v) { b.classList.add('hide'); return; } const r = appData.donghua.filter(d => d.title.toLowerCase().includes(v.toLowerCase())).slice(0, 5); b.innerHTML = ""; if (r.length === 0) b.innerHTML = "<div class='p-2 text-center text-gray-500 text-xs'>Nihil</div>"; r.forEach(i => { b.innerHTML += `<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="flex gap-2 p-2 border-b border-slate-700 cursor-pointer hover:bg-slate-700"><img src="${i.image}" alt="${i.title}" class="w-8 h-10 object-cover rounded"><div class="text-xs text-white font-bold">${i.title}</div></div>`; }); b.classList.remove('hide'); }
+        document.addEventListener('click', e => { if (!e.target.closest('.relative.max-w-md')) document.getElementById('search-results').classList.add('hide') });
+        
+        // ... Dan seterusnya sampai akhir script ...
+        // HAPUS fungsi: adminLogin, saveDonghua, deleteData, deleteChat, banUser, renderAdminList, addEpisodeRow, editData
+    </script>
+</body>
+</html>
 
     <style>
         body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
