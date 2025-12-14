@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo</title>
-    <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
+    <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia. Update setiap hari, gratis.">
     <meta name="theme-color" content="#0f172a">
+    
+    <!-- PRECONNECT -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://backup3d.ruslirusli123091.workers.dev">
     
     <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +21,14 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json?v=3">
     
-    <script type="text/javascript" src="https://pl28253644.effectivegatecpm.com/45/a0/58/45a058537afdc6637f4b27d76241566d.js" ></script>
     <style>
         body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
-        .poster-card { aspect-ratio: 2/3; object-fit: cover; width: 100%; transition: transform 0.3s; }
+        
+        /* OPTIMASI GAMBAR (CLS FIX) */
+        .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; background-color: #1e293b; overflow: hidden; }
+        .poster-card { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; opacity: 0; transition: opacity 0.3s ease-in; }
+        .poster-card.loaded { opacity: 1; }
         
         /* SCROLLBAR */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -36,57 +43,44 @@
         .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* GRIDS */
+        /* GRIDS & LAYOUT */
         .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
-        @media (min-width: 1024px) {
-            .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; }
-            .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; }
-        }
+        @media (min-width: 1024px) { .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; } .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; } }
         
         /* BUTTONS */
-        .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; min-width: 40px; min-height: 40px; }
         .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
         .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
         .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); transform: scale(1.05); }
-
-        /* SERVER BUTTONS */
-        .server-btn { font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; transition: all 0.2s; }
+        
+        .server-btn { font-size: 11px; padding: 6px 12px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer; transition: all 0.2s; min-height: 36px; }
         .server-btn.active { background: #3b82f6; color: white; border-color: #2563eb; }
-        .server-btn:hover:not(.active) { background: #334155; color: white; }
-
+        
         /* BANNER */
         .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
         .banner-slide.active { opacity: 1; pointer-events: auto; z-index: 10; }
         .banner-overlay { background: linear-gradient(to top, #0f172a 10%, transparent 90%); }
-        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; }
+        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; width: 8px; height: 8px; }
         .dot.active { background-color: #3b82f6; transform: scale(1.5); opacity: 1; }
         
         /* CHAT */
         .chat-bubble { margin-bottom: 8px; font-size: 0.75rem; }
         .chat-user { font-weight: bold; color: #60a5fa; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; }
         .chat-time { color: #64748b; font-weight: normal; font-size: 0.6rem; }
-        .chat-text { color: #e2e8f0; background: #1e293b; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 2px; max-width: 100%; word-wrap: break-word; }
+        .chat-text { color: #e2e8f0; background: #1e293b; padding: 6px 10px; border-radius: 4px; display: inline-block; margin-top: 2px; max-width: 100%; word-wrap: break-word; line-height: 1.4; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none"> 
+<body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none bg-slate-900"> 
 
-    <!-- HEADER (FIXED SEARCH AUTOFILL) -->
+    <!-- HEADER -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 h-16 px-4 flex items-center justify-between gap-3 shadow-lg">
-        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0">
-            <img src="logo.png" alt="CA3D" class="h-10 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0" aria-label="Ke Beranda">
+            <img src="logo.png" alt="CA3D Logo" width="40" height="40" class="h-10 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="text-lg font-black italic bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent tracking-tighter hidden">Chinese<span class="text-white not-italic font-bold">3D</span></span>
         </a>
         <div class="relative flex-1 max-w-md">
-            <input 
-                type="search" 
-                id="site_search_input_v2" 
-                name="search_query_random_x99" 
-                autocomplete="off" 
-                role="searchbox"
-                oninput="doSearch(this.value)" 
-                placeholder="Cari Donghua..." 
-                class="w-full bg-slate-800 text-gray-200 text-xs rounded-full pl-4 pr-4 py-2.5 border border-slate-700 focus:border-blue-500 outline-none transition focus:bg-slate-900"
-            >
+            <label for="site_search_input_v2" class="sr-only">Cari Donghua</label>
+            <input type="search" id="site_search_input_v2" name="search_q" autocomplete="off" oninput="doSearch(this.value)" placeholder="Cari Donghua..." class="w-full bg-slate-800 text-gray-200 text-sm rounded-full pl-4 pr-4 py-2.5 border border-slate-700 focus:border-blue-500 outline-none transition focus:bg-slate-900 h-10">
             <div id="search-results" class="absolute top-full left-0 w-full mt-2 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 max-h-80 overflow-y-auto hide z-50 p-2"></div>
         </div>
     </header>
@@ -101,10 +95,14 @@
                 <div id="banner-dots" class="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20"></div>
             </div>
             
-            <h2 id="list-title" class="text-sm font-bold mb-4 text-white flex items-center gap-2"><span class="w-1 h-4 bg-blue-500 rounded-full"></span> Update Terbaru</h2>
+            <h2 id="list-title" class="text-base font-bold mb-4 text-white flex items-center gap-2"><span class="w-1 h-5 bg-blue-500 rounded-full"></span> Update Terbaru</h2>
             <div id="donghua-list" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"></div>
             <div id="pagination-container" class="mt-8 flex justify-center items-center gap-2 flex-wrap pb-4"></div>
-            <div class="mt-8 pt-6 border-t border-slate-800"><h3 class="font-bold text-white mb-4 pl-2 border-l-4 border-red-500 text-sm">Sedang Populer 🔥</h3><div id="popular-list-home" class="space-y-3"></div></div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-800">
+                <h3 class="font-bold text-white mb-4 pl-2 border-l-4 border-red-500 text-sm">Sedang Populer 🔥</h3>
+                <div id="popular-list-home" class="space-y-3"></div>
+            </div>
         </div>
 
         <!-- SCHEDULE PAGE -->
@@ -114,66 +112,131 @@
             <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
 
-        <!-- AUTH PAGE (WITH PASS TOGGLE) -->
+        <!-- AUTH PAGE (WITH PASSWORD TOGGLE) -->
         <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
             <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
-                <div class="flex mb-6 border-b border-slate-700"><button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-2 text-center font-bold text-white border-b-2 border-blue-500">Masuk</button><button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-2 text-center font-bold text-gray-500">Daftar</button></div>
+                <div class="flex mb-6 border-b border-slate-700" role="tablist">
+                    <button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-3 text-center font-bold text-white border-b-2 border-blue-500" role="tab" aria-selected="true">Masuk</button>
+                    <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-3 text-center font-bold text-gray-400" role="tab" aria-selected="false">Daftar</button>
+                </div>
+                
+                <!-- LOGIN FORM -->
                 <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
-                    <input type="text" id="login-user" placeholder="Username" autocomplete="username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs">
-                    <div class="relative"><input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs pr-10"><button type="button" onclick="togglePass('login-pass', this)" class="absolute right-3 top-3 text-gray-400">👁️</button></div>
-                    <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500">Masuk</button>
+                    <label for="login-user" class="sr-only">Username</label>
+                    <input type="text" id="login-user" placeholder="Username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
+                    
+                    <!-- PASSWORD FIELD WITH TOGGLE -->
+                    <div class="relative">
+                        <label for="login-pass" class="sr-only">Password</label>
+                        <input type="password" id="login-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
+                        <button type="button" onclick="togglePass('login-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <!-- Eye Icon -->
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500 min-h-[44px]">Masuk</button>
                 </form>
+                
+                <!-- REGISTER FORM -->
                 <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide">
-                    <input type="text" id="reg-user" placeholder="Username Baru" autocomplete="off" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs">
-                    <div class="relative"><input type="password" id="reg-pass" placeholder="Password" autocomplete="new-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs pr-10"><button type="button" onclick="togglePass('reg-pass', this)" class="absolute right-3 top-3 text-gray-400">👁️</button></div>
-                    <button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500">Buat Akun</button>
+                    <label for="reg-user" class="sr-only">Username Baru</label>
+                    <input type="text" id="reg-user" placeholder="Username Baru" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
+                    
+                    <!-- PASSWORD FIELD WITH TOGGLE -->
+                    <div class="relative">
+                        <label for="reg-pass" class="sr-only">Password</label>
+                        <input type="password" id="reg-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
+                        <button type="button" onclick="togglePass('reg-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500 min-h-[44px]">Buat Akun</button>
                 </form>
-                <p id="auth-msg" class="text-center text-xs mt-4 h-4 text-yellow-400 font-bold"></p>
+
+                <p id="auth-msg" class="text-center text-xs mt-4 h-4 text-yellow-400 font-bold" aria-live="polite"></p>
+                <p class="text-center text-[10px] text-gray-400 mt-2 italic">Data Tersimpan Aman di Server.</p>
             </div>
         </div>
 
-        <!-- PROFILE PAGE -->
+        <!-- PROFILE PAGE (WITH PASSWORD TOGGLE) -->
         <div id="view-profile" class="hide">
-            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-lg">👤</div><div><p class="text-gray-400 text-[10px]">Halo,</p><h1 class="text-lg font-bold text-white leading-none" id="profile-name">User</h1></div></div><button onclick="userLogout()" class="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-bold">Logout</button></div>
-            <div class="flex gap-4 border-b border-slate-700 mb-4"><button onclick="switchProfileTab('bookmark')" id="tab-p-bookmark" class="tab-btn active flex-1 pb-3 font-bold text-center text-xs uppercase">Favorit</button><button onclick="switchProfileTab('history')" id="tab-p-history" class="tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase">Riwayat</button></div>
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-lg" aria-hidden="true">👤</div>
+                    <div><p class="text-gray-400 text-[10px]">Halo,</p><h1 class="text-lg font-bold text-white leading-none" id="profile-name">User</h1></div>
+                </div>
+                <button onclick="userLogout()" class="bg-red-500/10 text-red-400 px-4 py-2 rounded-lg border border-red-500/30 text-xs font-bold min-h-[36px]">Logout</button>
+            </div>
+            <div class="flex gap-4 border-b border-slate-700 mb-4" role="tablist">
+                <button onclick="switchProfileTab('bookmark')" id="tab-p-bookmark" class="tab-btn active flex-1 pb-3 font-bold text-center text-xs uppercase min-h-[44px]" role="tab">Favorit</button>
+                <button onclick="switchProfileTab('history')" id="tab-p-history" class="tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase min-h-[44px]" role="tab">Riwayat</button>
+            </div>
             <div id="profile-content-list" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-8"></div>
-            <div class="bg-slate-800 p-4 rounded border border-slate-700 mt-6"><h3 class="text-sm font-bold text-white mb-3">🔐 Ganti Password</h3><div class="flex flex-col gap-3">
-                <div class="relative"><input type="password" id="user-old-pass" placeholder="Pass Lama" class="w-full bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white pr-10"><button type="button" onclick="togglePass('user-old-pass', this)" class="absolute right-3 top-2 text-gray-400">👁️</button></div>
-                <div class="relative"><input type="password" id="user-new-pass" placeholder="Pass Baru" class="w-full bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white pr-10"><button type="button" onclick="togglePass('user-new-pass', this)" class="absolute right-3 top-2 text-gray-400">👁️</button></div>
-                <button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded text-xs font-bold">Simpan</button>
-            </div></div>
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 mt-6">
+                <h3 class="text-sm font-bold text-white mb-3">🔐 Ganti Password</h3>
+                <div class="flex flex-col gap-3">
+                    <label for="user-old-pass" class="sr-only">Password Lama</label>
+                    <div class="relative">
+                         <input type="password" id="user-old-pass" placeholder="Pass Lama" class="w-full bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white pr-10">
+                         <button type="button" onclick="togglePass('user-old-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <label for="user-new-pass" class="sr-only">Password Baru</label>
+                    <div class="relative">
+                        <input type="password" id="user-new-pass" placeholder="Pass Baru" class="w-full bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white pr-10">
+                        <button type="button" onclick="togglePass('user-new-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded text-sm font-bold min-h-[44px]">Simpan</button>
+                </div>
+            </div>
         </div>
 
         <!-- SYNOPSIS PAGE -->
         <div id="view-synopsis" class="hide">
             <div class="bg-slate-800/50 rounded-xl p-4 backdrop-blur-sm border border-slate-700/50 mb-6">
                 <div class="flex gap-4 mb-4">
-                    <div class="w-28 flex-shrink-0"><img id="syn-image" src="" alt="Poster" class="w-full rounded-lg shadow-lg poster-card bg-slate-700"></div>
-                    <div class="flex-1 min-w-0 flex flex-col"><h1 id="syn-title" class="text-base font-bold text-white mb-1 leading-tight">Title</h1><div class="flex items-center gap-2 text-[10px] text-gray-400 mb-3"><span id="syn-total-ep-info" class="bg-slate-700 px-1.5 py-0.5 rounded text-white">0 Eps</span><span id="syn-views">0 Views</span></div><div id="synopsis-buttons" class="mt-auto flex gap-2"></div></div>
+                    <div class="w-28 flex-shrink-0 poster-wrapper rounded-lg shadow-lg">
+                        <img id="syn-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Poster" width="112" height="168" class="poster-card">
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col">
+                        <h1 id="syn-title" class="text-base font-bold text-white mb-1 leading-tight">Title</h1>
+                        <div class="flex items-center gap-2 text-[11px] text-gray-400 mb-3">
+                            <span id="syn-total-ep-info" class="bg-slate-700 px-1.5 py-0.5 rounded text-white">0 Eps</span>
+                            <span id="syn-views">0 Views</span>
+                        </div>
+                        <div id="synopsis-buttons" class="mt-auto flex gap-2"></div>
+                    </div>
                 </div>
-                <p id="syn-desc" class="text-gray-400 text-xs leading-relaxed mb-4 line-clamp-4">Desc...</p>
-                <button id="btn-start-watch" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs mb-3 shadow-lg shadow-blue-900/20">MULAI NONTON</button>
-                <div class="border-t border-slate-700 pt-4 mt-2"><h3 class="font-bold text-white text-xs mb-3">DAFTAR EPISODE</h3><div id="syn-episodes" class="ep-grid-custom ep-grid-synopsis max-h-60 overflow-y-auto pr-1 pb-2"></div></div>
+                <p id="syn-desc" class="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-4">Desc...</p>
+                <button id="btn-start-watch" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-sm mb-3 shadow-lg shadow-blue-900/20 min-h-[44px]">MULAI NONTON</button>
+                <div class="border-t border-slate-700 pt-4 mt-2">
+                    <h3 class="font-bold text-white text-xs mb-3">DAFTAR EPISODE</h3>
+                    <div id="syn-episodes" class="ep-grid-custom ep-grid-synopsis max-h-60 overflow-y-auto pr-1 pb-2"></div>
+                </div>
             </div>
-            <div class="mt-6"><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Rekomendasi 🔥</h3><div id="popular-list-syn" class="space-y-3"></div></div>
+            <div class="mt-6">
+                <h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Rekomendasi 🔥</h3>
+                <div id="popular-list-syn" class="space-y-3"></div>
+            </div>
         </div>
 
-        <!-- WATCH PAGE (WITH SERVER SELECTION) -->
+        <!-- WATCH PAGE -->
         <div id="view-watch" class="hide">
             <div class="lg:flex lg:gap-6">
                 <div class="lg:w-[75%]">
-                    <!-- VIDEO PLAYER -->
                     <div class="aspect-video w-full relative bg-black shadow-lg">
-                        <iframe id="video-player" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                        <iframe id="video-player" src="" class="w-full h-full" frameborder="0" allowfullscreen title="Video Player"></iframe>
                     </div>
-                    
-                    <!-- SERVER SELECTOR -->
                     <div class="bg-slate-900 border-x border-b border-slate-800 p-2">
-                        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="server-list-container">
-                            <!-- Server buttons will be injected here -->
-                        </div>
+                        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="server-list-container"></div>
                     </div>
-
                     <div class="bg-slate-900 border-b border-slate-800 pb-3 mb-3">
                         <div class="flex justify-between items-start mt-3 mb-2 px-1">
                             <h2 id="watch-title" class="text-sm font-bold text-white flex-1 mr-2 leading-tight">Title</h2>
@@ -181,14 +244,24 @@
                         </div>
                         <div class="flex items-center gap-3 text-xs text-gray-500 px-1">
                             <span id="watch-views">0 Views</span>
-                            <a id="back-link" href="#" class="text-blue-500">Detail &rarr;</a>
+                            <a id="back-link" href="#" class="text-blue-500 p-2">Detail &rarr;</a>
                         </div>
                     </div>
-                    <div class="mt-4 mb-8 bg-slate-900 rounded-lg border border-slate-800 p-3"><h3 class="font-bold text-white mb-2 text-xs flex items-center gap-2">Live Chat</h3><div id="chat-container" class="h-48 overflow-y-auto pr-2 mb-2 space-y-2 border border-slate-800/50 rounded bg-slate-950/30 p-2 text-xs"></div><div id="chat-input-area"></div></div>
+                    <div class="mt-4 mb-8 bg-slate-900 rounded-lg border border-slate-800 p-3">
+                        <h3 class="font-bold text-white mb-2 text-xs flex items-center gap-2">Live Chat</h3>
+                        <div id="chat-container" class="h-48 overflow-y-auto pr-2 mb-2 space-y-2 border border-slate-800/50 rounded bg-slate-950/30 p-2 text-xs"></div>
+                        <div id="chat-input-area"></div>
+                    </div>
                 </div>
                 <div class="lg:w-[25%] lg:h-full">
-                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl"><h3 class="font-bold text-white text-xs mb-2">Pilih Episode</h3><div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto pb-2"></div></div>
-                    <div><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Lanjut Nonton 🔥</h3><div id="popular-list-watch" class="space-y-3"></div></div>
+                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl">
+                        <h3 class="font-bold text-white text-xs mb-2">Pilih Episode</h3>
+                        <div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto pb-2"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Lanjut Nonton 🔥</h3>
+                        <div id="popular-list-watch" class="space-y-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,10 +269,19 @@
 
     <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
-        <div class="flex justify-around items-center h-14">
-            <button onclick="navigateTo('/')" id="nav-home" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[9px]">Beranda</span></button>
-            <button onclick="navigateTo('?page=schedule')" id="nav-schedule" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-[9px]">Jadwal</span></button>
-            <button onclick="navigateToAccount()" id="nav-account" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[9px]">Akun</span></button>
+        <div class="flex justify-around items-center h-16">
+            <button onclick="navigateTo('/')" id="nav-home" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition active:scale-95" aria-label="Beranda">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px]">Beranda</span>
+            </button>
+            <button onclick="navigateTo('?page=schedule')" id="nav-schedule" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition active:scale-95" aria-label="Jadwal">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="text-[10px]">Jadwal</span>
+            </button>
+            <button onclick="navigateToAccount()" id="nav-account" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 transition active:scale-95" aria-label="Akun Saya">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span class="text-[10px]">Akun</span>
+            </button>
         </div>
     </nav>
 
@@ -208,43 +290,34 @@
         const CONFIG = { workerUrl: "https://backup3d.ruslirusli123091.workers.dev" }; 
         
         // STATE
-        let appData = { donghua: [] }, chatData = { comments: [] }, currentUser = null, currentUserNameDisplay = "";
+        let appData = { donghua: [] }, chatData = { comments: [] }, currentUser = null;
         let currentPage = 1; const ITEMS_PER_PAGE = 18;
         let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
         let activeScheduleDay = 'Senin';
-        
-        // ADMIN AUTO-DETECT (Jika sudah login di panel admin, otomatis dpt akses hapus chat)
-        let adminPass = localStorage.getItem('admin_pass'); 
 
         // UTILS
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
-        
-        // FITUR BARU: TOGGLE PASS
-        function togglePass(id, btn) {
-            const inp = document.getElementById(id);
-            const isP = inp.type === 'password';
-            inp.type = isP ? 'text' : 'password';
-            btn.innerText = isP ? '🙈' : '👁️';
-        }
 
-        // FITUR BARU: ADMIN ACTION (DELETE/BAN)
-        async function admDel(id) {
-            if(!confirm("Hapus Chat?")) return;
-            await fetch(`${CONFIG.workerUrl}/api/chat`, { method: 'PUT', headers: {'Content-Type':'application/json','X-Admin-Pass':adminPass}, body: JSON.stringify({action:'delete', commentId:id}) });
-            const p = new URLSearchParams(window.location.search); fetchChatData().then(() => renderChat(p.get('id'), p.get('ep')));
-        }
-        async function admBan(u) {
-            if(!confirm(`Ban user ${u}?`)) return;
-            await fetch(`${CONFIG.workerUrl}/api/users`, { method: 'PUT', headers: {'Content-Type':'application/json','X-Admin-Pass':adminPass}, body: JSON.stringify({action:'ban', username:u}) });
-            alert("Banned");
+        // TOGGLE PASSWORD FUNCTION
+        function togglePass(id, btn) {
+            const input = document.getElementById(id);
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            if (isPass) {
+                 // Ganti jadi icon Eye Slash (Tutup mata)
+                 btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>`;
+            } else {
+                 // Ganti jadi icon Eye (Buka mata)
+                 btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            }
         }
 
         // INIT
         window.addEventListener('load', async () => {
             const savedSession = localStorage.getItem('user_auth');
-            if (savedSession) { try { currentUser = JSON.parse(savedSession); } catch (e) { currentUser = null; } }
+            if (savedSession) { try { currentUser = JSON.parse(savedSession); } catch(e){ currentUser=null; } }
             
             const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             activeScheduleDay = daysMap[new Date().getDay()];
@@ -256,115 +329,251 @@
         window.addEventListener('hashchange', checkRoute);
         window.addEventListener('popstate', checkRoute);
 
-        // ROUTING
+        // ROUTING & API
+        async function fetchContent() {
+            document.getElementById('loading').classList.remove('hide');
+            try { const r = await fetch(`${CONFIG.workerUrl}/api/donghua`); const j = await r.json(); appData.donghua = j.donghua || []; } catch(e){}
+            document.getElementById('loading').classList.add('hide');
+        }
+        async function fetchChatData() { try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`); const j = await r.json(); chatData = j && j.comments ? j : { comments: [] }; } catch(e){} }
+
         function checkRoute() {
             const p = new URLSearchParams(window.location.search), page = p.get('page'), id = p.get('id'), ep = p.get('ep');
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hide'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (bannerInterval) clearInterval(bannerInterval);
-
-            if (page === 'auth') {
-                if (currentUser) { navigateTo('?page=profile'); return; }
-                document.getElementById('view-auth').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); switchAuthMode('login');
-            } else if (page === 'profile') {
-                if (!currentUser) { navigateTo('?page=auth'); return; }
-                document.getElementById('view-profile').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); renderProfile();
-            } else if (page === 'schedule') {
-                document.getElementById('view-schedule').classList.remove('hide'); document.getElementById('nav-schedule').classList.add('active'); switchScheduleTab(activeScheduleDay);
-            } else if (page === 'synopsis' && id) {
-                document.getElementById('view-synopsis').classList.remove('hide'); loadSynopsis(id);
-            } else if (page === 'watch' && id && ep) {
-                document.getElementById('view-watch').classList.remove('hide'); loadWatch(id, ep);
-            } else {
-                document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active'); renderHome();
-            }
+            if(bannerInterval) clearInterval(bannerInterval);
+            if(page === 'auth') { if(currentUser){ navigateTo('?page=profile');return; } document.getElementById('view-auth').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); switchAuthMode('login'); }
+            else if(page === 'profile') { if(!currentUser){ navigateTo('?page=auth');return; } document.getElementById('view-profile').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); renderProfile(); }
+            else if(page === 'schedule') { document.getElementById('view-schedule').classList.remove('hide'); document.getElementById('nav-schedule').classList.add('active'); switchScheduleTab(activeScheduleDay); }
+            else if(page === 'synopsis' && id) { document.getElementById('view-synopsis').classList.remove('hide'); loadSynopsis(id); }
+            else if(page === 'watch' && id && ep) { document.getElementById('view-watch').classList.remove('hide'); loadWatch(id, ep); }
+            else { document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active'); renderHome(); }
             window.scrollTo(0, 0);
         }
         function navigateTo(u) { window.history.pushState({}, '', u); checkRoute(); }
         function navigateToAccount() { if (currentUser) navigateTo('?page=profile'); else navigateTo('?page=auth'); }
 
-        // DATA
-        async function fetchContent() { document.getElementById('loading').classList.remove('hide'); try { const r = await fetch(`${CONFIG.workerUrl}/api/donghua`); const j = await r.json(); appData.donghua = j.donghua || []; } catch (e) { } document.getElementById('loading').classList.add('hide'); }
-        async function fetchChatData() { try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`); const j = await r.json(); chatData = j && j.comments ? j : { comments: [] }; } catch (e) { } }
+        // --- REALTIME AUTH ---
+        async function handleLogin() {
+            const u = document.getElementById('login-user').value.trim();
+            const p = document.getElementById('login-pass').value.trim();
+            const msg = document.getElementById('auth-msg');
+            if(!u || !p) return msg.innerText = "Isi semua kolom";
+            
+            msg.innerText = "Sedang masuk...";
+            const hashedUser = await hashString(u);
+            const hashedPass = await hashPass(p);
+            
+            try {
+                const req = await fetch(`${CONFIG.workerUrl}/api/member/login`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ username: hashedUser, password: hashedPass })
+                });
+                const res = await req.json();
+                if(req.ok && res.status === 'Success') {
+                    currentUser = { username: hashedUser, password: hashedPass, display_name: u, bookmarks: res.user.bookmarks, history: res.user.history };
+                    localStorage.setItem('user_auth', JSON.stringify(currentUser));
+                    msg.innerText = "Berhasil!";
+                    setTimeout(() => navigateTo('?page=profile'), 500);
+                } else { msg.innerText = res.error || "Gagal Login"; }
+            } catch(e) { msg.innerText = "Error Jaringan"; }
+        }
 
-        // RENDER HOME
+        async function handleRegister() {
+            const u = document.getElementById('reg-user').value.trim();
+            const p = document.getElementById('reg-pass').value.trim();
+            const msg = document.getElementById('auth-msg');
+            if(u.length < 3 || p.length < 3) return msg.innerText = "Minimal 3 karakter";
+            
+            msg.innerText = "Mendaftar...";
+            const hashedUser = await hashString(u);
+            const hashedPass = await hashPass(p);
+            
+            try {
+                const req = await fetch(`${CONFIG.workerUrl}/api/member/register`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ username: hashedUser, password: hashedPass })
+                });
+                const res = await req.json();
+                if(req.ok && res.status === 'Success') {
+                    currentUser = { username: hashedUser, password: hashedPass, display_name: u, bookmarks: [], history: [] };
+                    localStorage.setItem('user_auth', JSON.stringify(currentUser));
+                    msg.innerText = "Berhasil Mendaftar!";
+                    setTimeout(() => navigateTo('?page=profile'), 500);
+                } else { msg.innerText = res.error || "Gagal Daftar"; }
+            } catch(e) { msg.innerText = "Error Jaringan"; }
+        }
+
+        async function syncDataToServer(newPass = null) {
+            if(!currentUser) return;
+            try {
+                const payload = { username: currentUser.username, password: currentUser.password, bookmarks: currentUser.bookmarks, history: currentUser.history, newPassword: newPass };
+                const req = await fetch(`${CONFIG.workerUrl}/api/member/sync`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                if(req.ok && newPass) { currentUser.password = newPass; localStorage.setItem('user_auth', JSON.stringify(currentUser)); }
+            } catch(e) { console.error("Sync failed", e); }
+        }
+
+        async function changeUserPassword() {
+            const oldP = document.getElementById('user-old-pass').value.trim();
+            const newP = document.getElementById('user-new-pass').value.trim();
+            if(!oldP || !newP) return alert("Isi lengkap");
+            const hashedOld = await hashPass(oldP); const hashedNew = await hashPass(newP);
+            if(hashedOld !== currentUser.password) return alert("Password lama salah");
+            await syncDataToServer(hashedNew); alert("Password berhasil diubah!");
+        }
+
+        function userLogout() { currentUser = null; localStorage.removeItem('user_auth'); navigateTo('/'); }
+        function switchAuthMode(m) { 
+            const l=document.getElementById('tab-login'), r=document.getElementById('tab-register'); 
+            const fL=document.getElementById('form-login'), fR=document.getElementById('form-register');
+            document.getElementById('auth-msg').innerText="";
+            if(m==='login'){
+                fL.classList.remove('hide'); fR.classList.add('hide');
+                l.classList.add('border-blue-500','text-white'); l.classList.remove('text-gray-400');
+                r.classList.remove('border-blue-500','text-white'); r.classList.add('text-gray-400');
+                l.setAttribute('aria-selected', 'true'); r.setAttribute('aria-selected', 'false');
+            } else {
+                fR.classList.remove('hide'); fL.classList.add('hide');
+                r.classList.add('border-blue-500','text-white'); r.classList.remove('text-gray-400');
+                l.classList.remove('border-blue-500','text-white'); l.classList.add('text-gray-400');
+                r.setAttribute('aria-selected', 'true'); l.setAttribute('aria-selected', 'false');
+            } 
+        }
+
+        // --- FEATURES ---
+        async function toggleBookmark() {
+            if(!currentUser) return alert("Login dulu untuk menyimpan Bookmark (Permanen)");
+            const p = new URLSearchParams(window.location.search), id = p.get('id');
+            if(!currentUser.bookmarks) currentUser.bookmarks = [];
+            const idx = currentUser.bookmarks.indexOf(id);
+            if(idx > -1) currentUser.bookmarks.splice(idx, 1); else currentUser.bookmarks.push(id);
+            updateBookmarkUI(id);
+            localStorage.setItem('user_auth', JSON.stringify(currentUser)); syncDataToServer();
+        }
+        function updateBookmarkUI(id) {
+            const isSaved = currentUser && currentUser.bookmarks.includes(id);
+            const btnWatch = document.getElementById('btn-bookmark-watch');
+            if(btnWatch) { btnWatch.innerHTML = isSaved?'❤️':'🤍'; btnWatch.className = isSaved?'text-pink-500 text-lg p-2':'text-gray-400 hover:text-pink-500 transition text-lg p-2'; btnWatch.setAttribute('aria-label', isSaved ? 'Hapus dari Favorit' : 'Tambah ke Favorit'); }
+            const btnSyn = document.getElementById('btn-bookmark');
+            if(btnSyn) { btnSyn.innerHTML = isSaved?"❤️ Tersimpan":"🤍 Favorit"; btnSyn.setAttribute('aria-label', isSaved ? 'Hapus dari Favorit' : 'Tambah ke Favorit'); }
+        }
+
+        // --- RENDERERS ---
         function renderHome() {
-            renderBanner(); const c = document.getElementById('donghua-list'); c.innerHTML = ""; const pagContainer = document.getElementById('pagination-container'); pagContainer.innerHTML = "";
-            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0)); const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE); if (currentPage < 1) currentPage = 1; if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            const start = (currentPage - 1) * ITEMS_PER_PAGE; const pageData = sorted.slice(start, start + ITEMS_PER_PAGE);
+            renderBanner(); 
+            const c = document.getElementById('donghua-list'); c.innerHTML = ""; 
+            const pagContainer = document.getElementById('pagination-container'); pagContainer.innerHTML = "";
+            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+            const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
+            if(currentPage < 1) currentPage = 1; if(currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            const start = (currentPage-1)*ITEMS_PER_PAGE; 
+            const pageData = sorted.slice(start, start + ITEMS_PER_PAGE);
+            
             pageData.forEach(i => { 
                 const latestEp = getLatestEp(i.episodes); 
-                c.innerHTML += `<a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="relative cursor-pointer active:scale-95 transition-transform group block"><div class="rounded-lg overflow-hidden relative bg-slate-800 shadow-lg border border-slate-700/50 poster-wrapper"><img src="${i.image}" alt="${i.title}" class="poster-card transition duration-500 group-hover:scale-110" loading="lazy"><div class="absolute top-1 right-1 bg-blue-600/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">EP ${latestEp}</div><div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent p-2 pt-8"><h3 class="text-white text-[11px] font-bold truncate leading-tight">${i.title}</h3></div></div></a>`; 
+                c.innerHTML += `
+                <a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="relative cursor-pointer active:scale-95 transition-transform group block">
+                    <div class="rounded-lg overflow-hidden relative bg-slate-800 shadow-lg border border-slate-700/50 poster-wrapper">
+                        <img src="${i.image}" alt="Nonton ${i.title}" width="150" height="225" loading="lazy" class="poster-card transition duration-500 group-hover:scale-110" onload="this.classList.add('loaded')">
+                        <div class="absolute top-1 right-1 bg-blue-600/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">EP ${latestEp}</div>
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent p-2 pt-8">
+                            <h3 class="text-white text-[11px] font-bold truncate leading-tight">${i.title}</h3>
+                        </div>
+                    </div>
+                </a>`; 
             });
-            if (totalPages > 1) { pagContainer.innerHTML = `<button onclick="changePage(${currentPage - 1})" class="page-btn bg-slate-800 text-white px-4 py-2 rounded border border-slate-700 mr-2 disabled:opacity-50 min-h-[44px]" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button><button onclick="changePage(${currentPage + 1})" class="page-btn bg-slate-800 text-white px-4 py-2 rounded border border-slate-700 disabled:opacity-50 min-h-[44px]" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`; }
+            
+            if(totalPages > 1) { 
+                pagContainer.innerHTML = `<button onclick="changePage(${currentPage-1})" class="page-btn bg-slate-800 text-white px-4 py-2 rounded border border-slate-700 mr-2 disabled:opacity-50 min-h-[44px]" ${currentPage===1?'disabled':''} aria-label="Halaman Sebelumnya">&lt;</button><button onclick="changePage(${currentPage+1})" class="page-btn bg-slate-800 text-white px-4 py-2 rounded border border-slate-700 disabled:opacity-50 min-h-[44px]" ${currentPage===totalPages?'disabled':''} aria-label="Halaman Selanjutnya">&gt;</button>`;
+            }
             renderSidebars();
         }
-        function changePage(pageNum) { currentPage = pageNum; renderHome(); document.getElementById('list-title').scrollIntoView({ behavior: 'smooth' }); }
+        function changePage(n) { currentPage = n; renderHome(); document.getElementById('list-title').scrollIntoView({behavior:'smooth'}); }
+
         function renderBanner() {
-            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0)); const wrapper = document.getElementById('banner-wrapper'); const dots = document.getElementById('banner-dots'); if (sorted.length === 0) { document.getElementById('hero-banner-container').classList.add('hide'); return; }
-            document.getElementById('hero-banner-container').classList.remove('hide'); currentBannerIndex = 0; wrapper.innerHTML = ""; dots.innerHTML = ""; sorted.slice(0, 5).forEach((item, index) => { const latestEp = getLatestEp(item.episodes); wrapper.innerHTML += `<div class="banner-slide ${index === 0 ? 'active' : ''}"><div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${item.image}');"></div><div class="absolute inset-0 banner-overlay"></div><div class="relative z-10 p-4 pt-20 flex flex-col justify-end h-full pb-8"><div><span class="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded mb-2 inline-block shadow">HOT UPDATE</span><h1 class="text-lg sm:text-2xl font-black text-white leading-tight line-clamp-2 drop-shadow-md mb-2">${item.title}</h1><button onclick="navigateTo('?page=watch&id=${item.id}&ep=${latestEp}')" class="bg-blue-600 text-white text-[10px] font-bold px-4 py-2 rounded-full shadow-lg flex items-center w-fit gap-1 hover:bg-blue-500 transition min-h-[36px]">▶ TONTON EP ${latestEp}</button></div></div></div>`; dots.innerHTML += `<button onclick="changeBanner(${index}); resetBannerInterval();" class="dot w-1.5 h-1.5 rounded-full ${index === 0 ? 'active' : ''}"></button>`; }); startBannerSlider(sorted.slice(0, 5).length);
+            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+            const wrapper = document.getElementById('banner-wrapper'), dots = document.getElementById('banner-dots');
+            if(sorted.length === 0) return document.getElementById('hero-banner-container').classList.add('hide');
+            document.getElementById('hero-banner-container').classList.remove('hide');
+            currentBannerIndex = 0; wrapper.innerHTML = ""; dots.innerHTML = "";
+            sorted.slice(0, 5).forEach((item, index) => {
+                const latestEp = getLatestEp(item.episodes);
+                const fetchPrio = index === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
+                wrapper.innerHTML += `
+                <div class="banner-slide ${index===0?'active':''}">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${item.image}');"></div>
+                    <div class="absolute inset-0 banner-overlay"></div>
+                    <div class="relative z-10 p-4 pt-20 flex flex-col justify-end h-full pb-8">
+                        <div>
+                            <span class="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded mb-2 inline-block shadow">HOT UPDATE</span>
+                            <h1 class="text-lg sm:text-2xl font-black text-white leading-tight line-clamp-2 drop-shadow-md mb-2">${item.title}</h1>
+                            <button onclick="navigateTo('?page=watch&id=${item.id}&ep=${latestEp}')" class="bg-blue-600 text-white text-[10px] font-bold px-4 py-2 rounded-full shadow-lg flex items-center w-fit gap-1 hover:bg-blue-500 transition min-h-[36px]" aria-label="Tonton ${item.title} Episode ${latestEp}">▶ TONTON EP ${latestEp}</button>
+                        </div>
+                    </div>
+                </div>`;
+                const dot = document.createElement('button'); dot.className = `dot w-1.5 h-1.5 rounded-full ${index===0?'active':''}`; dot.setAttribute('aria-label', `Banner ${index+1}`); dot.onclick=(e)=>{e.stopPropagation();changeBanner(index);resetBannerInterval();}; dots.appendChild(dot);
+            });
+            startBannerSlider(sorted.slice(0,5).length);
         }
-        function changeBanner(index) { const slides = document.querySelectorAll('.banner-slide'); const dots = document.querySelectorAll('.dot'); if (slides.length === 0) return; slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active')); currentBannerIndex = index; if (currentBannerIndex >= slides.length) currentBannerIndex = 0; if (currentBannerIndex < 0) currentBannerIndex = slides.length - 1; slides[currentBannerIndex].classList.add('active'); dots[currentBannerIndex].classList.add('active'); }
-        function startBannerSlider(length) { if (bannerInterval) clearInterval(bannerInterval); if (length <= 1) return; bannerInterval = setInterval(() => { changeBanner(currentBannerIndex + 1); }, 4000); }
-        function resetBannerInterval() { const slides = document.querySelectorAll('.banner-slide'); startBannerSlider(slides.length); }
-        function renderSidebars() { const s = [...appData.donghua].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5); ['popular-list-home', 'popular-list-syn', 'popular-list-watch'].forEach(id => { const el = document.getElementById(id); if (el) { el.innerHTML = ""; s.forEach((i, x) => { el.innerHTML += `<a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="flex gap-3 items-center p-2 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700 transition block mb-2"><span class="text-lg font-bold text-gray-500 w-4 text-center italic">${x + 1}</span><img src="${i.image}" class="w-10 h-14 object-cover rounded bg-slate-900"><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${i.title}</h4><p class="text-[10px] text-gray-400">${i.views || 0} Views</p></div></a>`; }); } }); }
+        function changeBanner(i) { const s=document.querySelectorAll('.banner-slide'), d=document.querySelectorAll('.dot'); if(s.length===0)return; s.forEach(el=>el.classList.remove('active')); d.forEach(el=>el.classList.remove('active')); currentBannerIndex=i; if(currentBannerIndex>=s.length)currentBannerIndex=0; if(currentBannerIndex<0)currentBannerIndex=s.length-1; s[currentBannerIndex].classList.add('active'); d[currentBannerIndex].classList.add('active'); }
+        function startBannerSlider(len) { if(bannerInterval) clearInterval(bannerInterval); if(len<=1)return; bannerInterval=setInterval(()=>changeBanner(currentBannerIndex+1),4000); }
+        function resetBannerInterval() { const s=document.querySelectorAll('.banner-slide'); startBannerSlider(s.length); }
+        
+        function renderSidebars() {
+             const s = [...appData.donghua].sort((a, b) => (b.views||0) - (a.views||0)).slice(0, 5);
+             ['popular-list-home', 'popular-list-syn', 'popular-list-watch'].forEach(id => {
+                 const el = document.getElementById(id); if(el) { el.innerHTML = ""; s.forEach((i, x) => el.innerHTML += `<a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="flex gap-3 items-center p-2 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700 transition block mb-2"><span class="text-lg font-bold text-gray-500 w-4 text-center italic">${x+1}</span><img src="${i.image}" alt="${i.title}" width="40" height="56" class="w-10 h-14 object-cover rounded bg-slate-900"><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${i.title}</h4><p class="text-[10px] text-gray-400">${i.views||0} Views</p></div></a>`); }
+             });
+        }
 
-        // SYNOPSIS
-        async function openSynopsisAndTrack(id) { const idx = appData.donghua.findIndex(d => d.id == id); if (idx > -1) { appData.donghua[idx].views = (appData.donghua[idx].views || 0) + 1; fetch(`${CONFIG.workerUrl}/api/view`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) }).catch(err => {}); } navigateTo(`?page=synopsis&id=${id}`); }
+        async function openSynopsisAndTrack(id) { 
+            const idx = appData.donghua.findIndex(d => d.id == id); if(idx>-1){ appData.donghua[idx].views=(appData.donghua[idx].views||0)+1; fetch(`${CONFIG.workerUrl}/api/view`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}).catch(()=>{}); } navigateTo(`?page=synopsis&id=${id}`); 
+        }
         function loadSynopsis(id) {
-            const i = appData.donghua.find(d => d.id == id); if (!i) return;
-            document.getElementById('syn-title').innerText = i.title; document.getElementById('syn-desc').innerText = i.synopsis; const img = document.getElementById('syn-image'); img.src = i.image; img.onload=function(){this.classList.add('loaded')}; document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length || 0) + " Eps"; document.getElementById('syn-views').innerText = (i.views || 0) + " Views";
-            const btnContainer = document.getElementById('synopsis-buttons'); const isBookmarked = currentUser && (currentUser.bookmarks || []).includes(id); btnContainer.innerHTML = `<button id="btn-bookmark" onclick="toggleBookmark()" class="bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-600 flex-1 min-h-[40px]">${isBookmarked ? '❤️ Tersimpan' : '🤍 Favorit'}</button><button onclick="showShare('${id}', null, '${i.title}')" class="bg-green-600/80 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg border border-green-500/50 min-h-[40px]">🔗 Bagikan</button>`;
-            document.getElementById('btn-start-watch').onclick = function () { if (i.episodes && i.episodes.length > 0) { const sorted = [...i.episodes].sort((a, b) => a.ep - b.ep); navigateTo(`?page=watch&id=${id}&ep=${sorted[0].ep}`); } else { alert("Belum ada episode."); } };
-            const c = document.getElementById('syn-episodes'); c.innerHTML = ""; (i.episodes || []).sort((a, b) => a.ep - b.ep).forEach(e => { c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${e.ep}')" class="ep-btn ep-btn-default">${e.ep}</button>`; }); renderSidebars();
+            const i = appData.donghua.find(d => d.id == id); if(!i) return;
+            document.getElementById('syn-title').innerText = i.title; document.getElementById('syn-desc').innerText = i.synopsis; 
+            const img = document.getElementById('syn-image'); img.src = i.image; img.alt = "Poster " + i.title; img.onload=function(){this.classList.add('loaded')};
+            document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length||0)+" Eps"; document.getElementById('syn-views').innerText = (i.views||0)+" Views";
+            const btnContainer = document.getElementById('synopsis-buttons');
+            const isBookmarked = currentUser && (currentUser.bookmarks||[]).includes(id);
+            btnContainer.innerHTML = `<button id="btn-bookmark" onclick="toggleBookmark()" class="bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-600 flex-1 min-h-[40px]">${isBookmarked?'❤️ Tersimpan':'🤍 Favorit'}</button><button onclick="showShare('${id}',null,'${i.title}')" class="bg-green-600/80 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg border border-green-500/50 min-h-[40px]" aria-label="Bagikan">🔗 Bagikan</button>`;
+            document.getElementById('btn-start-watch').onclick = () => { if(i.episodes && i.episodes.length>0) navigateTo(`?page=watch&id=${id}&ep=${[...i.episodes].sort((a,b)=>a.ep-b.ep)[0].ep}`); else alert("Belum ada episode"); };
+            const c = document.getElementById('syn-episodes'); c.innerHTML = "";
+            (i.episodes||[]).sort((a,b)=>a.ep-b.ep).forEach(e => c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${e.ep}')" class="ep-btn ep-btn-default" aria-label="Episode ${e.ep}">${e.ep}</button>`);
+            renderSidebars();
         }
 
-        // WATCH
         function loadWatch(id, epNum) {
-            const i = appData.donghua.find(d => d.id == id), e = i.episodes.find(x => x.ep == epNum); if (!e) return;
-            document.getElementById('watch-title').innerText = `${i.title} - Eps ${epNum}`; document.getElementById('watch-views').innerText = `${i.views || 0} Views`; document.getElementById('back-link').onclick = (ev) => { ev.preventDefault(); navigateTo(`?page=synopsis&id=${id}`) };
-            document.getElementById('watch-page-buttons').innerHTML = `<button id="btn-bookmark-watch" onclick="toggleBookmark()" class="text-gray-400 hover:text-pink-500 transition text-lg p-2">🤍</button><button onclick="showShare('${id}', '${epNum}', '${i.title}')" class="text-gray-400 hover:text-blue-500 transition text-lg p-2">🔗</button>`; updateBookmarkUI(id);
-            if (currentUser) { if (!currentUser.history) currentUser.history = []; const hIdx = currentUser.history.findIndex(h => h.id == id); if (hIdx > -1) currentUser.history.splice(hIdx, 1); currentUser.history.unshift({ id: id, ep: epNum }); if (currentUser.history.length > 50) currentUser.history.pop(); localStorage.setItem('user_auth', JSON.stringify(currentUser)); syncDataToServer(); }
-            const c = document.getElementById('watch-ep-list'); c.innerHTML = ""; i.episodes.sort((a, b) => a.ep - b.ep).forEach(ep => { const isActive = ep.ep == epNum; const btnClass = isActive ? "ep-btn-active" : "ep-btn-default"; c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${ep.ep}')" class="ep-btn ${btnClass}">${ep.ep}</button>`; });
-            const streams = parseStreams(e.url); renderServerButtons(streams); if(streams.length > 0) document.getElementById('video-player').src = streams[0].url;
+            const i = appData.donghua.find(d => d.id == id), e = i.episodes.find(x => x.ep == epNum); if(!e) return;
+            document.getElementById('watch-title').innerText = `${i.title} - Eps ${epNum}`; document.getElementById('watch-views').innerText = `${i.views||0} Views`; document.getElementById('back-link').onclick = (ev) => { ev.preventDefault(); navigateTo(`?page=synopsis&id=${id}`) };
+            const btnContainer = document.getElementById('watch-page-buttons');
+            btnContainer.innerHTML = `<button id="btn-bookmark-watch" onclick="toggleBookmark()" class="text-gray-400 hover:text-pink-500 transition text-lg p-2" aria-label="Simpan">🤍</button><button onclick="showShare('${id}','${epNum}','${i.title}')" class="text-gray-400 hover:text-blue-500 transition text-lg p-2" aria-label="Bagikan">🔗</button>`;
+            updateBookmarkUI(id);
+            if(currentUser) { 
+                if(!currentUser.history) currentUser.history=[]; 
+                const hIdx=currentUser.history.findIndex(h=>h.id==id); if(hIdx>-1) currentUser.history.splice(hIdx,1); 
+                currentUser.history.unshift({id, ep:epNum}); if(currentUser.history.length>50)currentUser.history.pop(); 
+                localStorage.setItem('user_auth', JSON.stringify(currentUser)); syncDataToServer();
+            }
+            const c = document.getElementById('watch-ep-list'); c.innerHTML = "";
+            i.episodes.sort((a,b)=>a.ep-b.ep).forEach(ep => c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${ep.ep}')" class="ep-btn ${ep.ep==epNum?'ep-btn-active':'ep-btn-default'}" aria-label="Episode ${ep.ep}">${ep.ep}</button>`);
+            const streams = parseStreams(e.url); renderServerButtons(streams);
+            if(streams.length>0) document.getElementById('video-player').src = streams[0].url;
             fetchChatData().then(() => renderChat(id, epNum)); renderSidebars();
         }
-        function parseStreams(urlStr) { if (!urlStr.includes('|')) return [{ name: "Default", url: urlStr }]; const lines = urlStr.split('\n'); const streams = []; lines.forEach(line => { const parts = line.split('|'); if (parts.length >= 2) { streams.push({ name: parts[0].trim(), url: parts.slice(1).join('|').trim() }); } }); if (streams.length === 0 && urlStr.trim().length > 0) return [{ name: "Default", url: urlStr }]; return streams; }
-        function renderServerButtons(streams) { const container = document.getElementById('server-list-container'); container.innerHTML = ""; if (streams.length <= 1) return container.parentElement.style.display = 'none'; container.parentElement.style.display = 'block'; streams.forEach((s, idx) => { const btn = document.createElement('button'); btn.className = `server-btn ${idx === 0 ? 'active' : ''} whitespace-nowrap`; btn.innerText = s.name; btn.onclick = () => { document.getElementById('video-player').src = s.url; document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }; container.appendChild(btn); }); }
 
-        // CHAT WITH ADMIN LOGIC
-        async function sendChat(dId, ep) { const input = document.getElementById('chat-input'), msg = input.value.trim(); if (!msg) return; const newChat = { id: Date.now().toString(), donghuaId: dId, ep: ep, user: currentUser ? currentUser.display_name : "User", text: msg, timestamp: Date.now() }; try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "add", comment: newChat }) }); const res = await r.json(); if (r.ok && res.status === "Chat Saved") { input.value = ""; chatData.comments.push(newChat); renderChat(dId, ep); } else alert(res.error || "Gagal"); } catch (e) { alert("Error"); } }
-        function renderChat(dId, ep) { 
-            const c = document.getElementById('chat-container'), a = document.getElementById('chat-input-area'); 
-            if (currentUser) a.innerHTML = `<div class="flex gap-2"><input type="text" id="chat-input" class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs" placeholder="Komentar..."><button onclick="sendChat('${dId}', '${ep}')" class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-xs min-h-[36px]">Kirim</button></div>`; else a.innerHTML = `<button onclick="navigateTo('?page=auth')" class="w-full bg-slate-800 text-blue-400 py-2 rounded text-xs border border-slate-700 dashed">Login untuk Chat</button>`; 
-            const msgs = chatData.comments.filter(x => x.donghuaId === dId && x.ep == ep).sort((a, b) => a.timestamp - b.timestamp); c.innerHTML = ""; 
-            if (msgs.length === 0) c.innerHTML = `<div class="text-center text-gray-500 text-xs py-10">Belum ada komentar.</div>`; 
-            msgs.forEach(m => { 
-                let adminControls = "";
-                if(adminPass) {
-                    adminControls = `<div class="flex justify-end gap-2 mt-1 border-t border-slate-700 pt-1">
-                        <button onclick="admBan('${m.user}')" class="text-[10px] text-red-400 border border-red-900 px-1 rounded hover:bg-red-900">BAN 🚫</button>
-                        <button onclick="admDel('${m.id}')" class="text-[10px] text-yellow-400 border border-yellow-900 px-1 rounded hover:bg-yellow-900">DEL 🗑️</button>
-                    </div>`;
-                }
-                c.innerHTML += `<div class="chat-bubble"><div class="chat-user">${m.user} <span class="chat-time">${timeAgo(m.timestamp)}</span></div><div class="chat-text">${m.text}</div>${adminControls}</div>`; 
-            }); c.scrollTop = c.scrollHeight; 
-        }
-        function timeAgo(ts) { const s = Math.floor((Date.now() - ts) / 1000); if (s > 31536000) return Math.floor(s / 31536000) + " thn"; if (s > 2592000) return Math.floor(s / 2592000) + " bln"; if (s > 86400) return Math.floor(s / 86400) + " hr"; return "Barusan"; }
+        function parseStreams(u) { if(!u.includes('|')) return [{name:"Default", url:u}]; return u.split('\n').map(l=>{const p=l.split('|'); return p.length>=2?{name:p[0].trim(),url:p.slice(1).join('|').trim()}:null}).filter(Boolean); }
+        function renderServerButtons(s) { const c=document.getElementById('server-list-container'); c.innerHTML=""; if(s.length<=1)return c.parentElement.style.display='none'; c.parentElement.style.display='block'; s.forEach((v,k)=>{ const b=document.createElement('button'); b.className=`server-btn ${k===0?'active':''} whitespace-nowrap`; b.innerText=v.name; b.onclick=()=>{document.getElementById('video-player').src=v.url;document.querySelectorAll('.server-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active')}; c.appendChild(b); }); }
 
-        function renderSchedButtons() { const d = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]; const c = document.getElementById('sched-buttons-container'); c.innerHTML = ""; d.forEach(day => { c.innerHTML += `<button onclick="switchScheduleTab('${day}')" id="btn-${day}" class="sched-btn ${day === 'Minggu' ? 'col-span-2' : ''} bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition min-h-[36px]">${day}</button>`; }); }
-        function switchScheduleTab(day) { activeScheduleDay = day; document.querySelectorAll('.sched-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-${day}`).classList.add('active'); const c = document.getElementById('schedule-content-grid'); c.innerHTML = ""; const list = appData.donghua.filter(d => d.day && d.day.includes(day)); if (list.length === 0) return c.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 text-xs">Tidak ada jadwal hari ${day}</div>`; list.forEach(i => { let t = "Rutin"; if (i.scheduledTime) { const d = new Date(i.scheduledTime); t = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; } c.innerHTML += `<div onclick="openSynopsisAndTrack('${i.id}')" class="bg-slate-800 rounded overflow-hidden shadow-lg border border-slate-700 cursor-pointer relative active:scale-95 transition"><div class="relative poster-wrapper"><img src="${i.image}" alt="${i.title}" width="150" height="200" loading="lazy" class="w-full h-full object-cover poster-card" onload="this.classList.add('loaded')"><div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-2 pt-6"><h4 class="text-white text-[11px] font-bold leading-tight line-clamp-2">${i.title}</h4></div><div class="absolute top-1 left-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">TV</div></div><div class="p-2 bg-slate-850 flex justify-center items-center border-t border-slate-700"><span class="text-gray-300 text-[10px] flex items-center gap-1">🕒 ${t}</span></div></div>`; }); }
+        async function sendChat(dId, ep) { const inp=document.getElementById('chat-input'), txt=inp.value.trim(); if(!txt)return; const newChat={id:Date.now().toString(), donghuaId:dId, ep, user:currentUser?currentUser.display_name:"User", text:txt, timestamp:Date.now()}; try { const r=await fetch(`${CONFIG.workerUrl}/api/chat`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",comment:newChat})}); const j=await r.json(); if(r.ok && j.status==="Chat Saved"){ inp.value=""; chatData.comments.push(newChat); renderChat(dId, ep); } else alert(j.error||"Gagal"); } catch(e){alert("Error:"+e.message);} }
+        function renderChat(dId, ep) { const c=document.getElementById('chat-container'), a=document.getElementById('chat-input-area'); if(currentUser) a.innerHTML=`<div class="flex gap-2"><label for="chat-input" class="sr-only">Komentar</label><input type="text" id="chat-input" class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs" placeholder="Komentar..."><button onclick="sendChat('${dId}','${ep}')" class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-xs min-h-[36px]">Kirim</button></div>`; else a.innerHTML=`<button onclick="navigateTo('?page=auth')" class="w-full bg-slate-800 text-blue-400 py-2 rounded text-xs border border-slate-700 dashed">Login untuk Chat</button>`; const msgs=chatData.comments.filter(x=>x.donghuaId===dId && x.ep==ep).sort((a,b)=>a.timestamp-b.timestamp); c.innerHTML=""; if(msgs.length===0) c.innerHTML=`<div class="text-center text-gray-500 text-xs py-10">Belum ada komentar.</div>`; msgs.forEach(m=>{ c.innerHTML+=`<div class="chat-bubble"><div class="chat-user">${m.user} <span class="chat-time">${timeAgo(m.timestamp)}</span></div><div class="chat-text">${m.text}</div></div>`; }); c.scrollTop=c.scrollHeight; }
+        function timeAgo(ts) { const s=Math.floor((Date.now()-ts)/1000); if(s>31536000)return Math.floor(s/31536000)+" thn"; if(s>2592000)return Math.floor(s/2592000)+" bln"; if(s>86400)return Math.floor(s/86400)+" hr"; return "Barusan"; }
 
-        function renderProfile() { document.getElementById('profile-name').innerText = currentUser ? currentUser.display_name : "User"; document.getElementById('tab-p-bookmark').className = `tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab === 'bookmark' ? 'active' : 'text-gray-500'}`; document.getElementById('tab-p-history').className = `tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab === 'history' ? 'active' : 'text-gray-500'}`; const c = document.getElementById('profile-content-list'); c.innerHTML = ""; let data = []; if (currentProfileTab === 'bookmark') data = (currentUser.bookmarks || []).map(id => appData.donghua.find(d => d.id == id)).filter(Boolean); else data = (currentUser.history || []).map(h => { const d = appData.donghua.find(x => x.id == h.id); return d ? { ...d, lastEp: h.ep } : null }).filter(Boolean); if (data.length === 0) c.innerHTML = `<div class="col-span-full text-center text-gray-500 text-xs py-10">Kosong</div>`; data.forEach(i => { c.innerHTML += `<div onclick="${currentProfileTab === 'history' ? `navigateTo('?page=watch&id=${i.id}&ep=${i.lastEp}')` : `openSynopsisAndTrack('${i.id}')`}" class="relative cursor-pointer active:scale-95 transition"><div class="rounded overflow-hidden bg-slate-800 poster-wrapper"><img src="${i.image}" alt="${i.title}" loading="lazy" class="poster-card" onload="this.classList.add('loaded')"><div class="absolute top-1 right-1 ${currentProfileTab === 'history' ? 'bg-green-600' : 'bg-pink-600'} text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">${currentProfileTab === 'history' ? 'EP ' + i.lastEp : '♥'}</div><div class="p-2"><h4 class="text-white text-[10px] font-bold truncate">${i.title}</h4></div></div></div>`; }); }
-        function switchProfileTab(t) { currentProfileTab = t; renderProfile(); }
+        function renderSchedButtons() { const d=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"]; const c=document.getElementById('sched-buttons-container'); c.innerHTML=""; d.forEach(day => { c.innerHTML += `<button onclick="switchScheduleTab('${day}')" id="btn-${day}" class="sched-btn ${day==='Minggu'?'col-span-2':''} bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition min-h-[36px]">${day}</button>`; }); }
+        function switchScheduleTab(day) { activeScheduleDay=day; document.querySelectorAll('.sched-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`btn-${day}`).classList.add('active'); const c=document.getElementById('schedule-content-grid'); c.innerHTML=""; const list=appData.donghua.filter(d=>d.day && d.day.includes(day)); if(list.length===0) return c.innerHTML=`<div class="col-span-full text-center text-gray-500 py-10 text-xs">Tidak ada jadwal hari ${day}</div>`; list.forEach(i=>{ let t="Rutin"; if(i.scheduledTime){const d=new Date(i.scheduledTime); t=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;} c.innerHTML+=`<div onclick="openSynopsisAndTrack('${i.id}')" class="bg-slate-800 rounded overflow-hidden shadow-lg border border-slate-700 cursor-pointer relative active:scale-95 transition"><div class="relative poster-wrapper"><img src="${i.image}" alt="${i.title}" width="150" height="200" loading="lazy" class="w-full h-full object-cover poster-card" onload="this.classList.add('loaded')"><div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-2 pt-6"><h4 class="text-white text-[11px] font-bold leading-tight line-clamp-2">${i.title}</h4></div><div class="absolute top-1 left-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">TV</div></div><div class="p-2 bg-slate-850 flex justify-center items-center border-t border-slate-700"><span class="text-gray-300 text-[10px] flex items-center gap-1">🕒 ${t}</span></div></div>`; }); }
 
-        // --- AUTH API ---
-        async function handleLogin() { const u=document.getElementById('login-user').value.trim(), p=document.getElementById('login-pass').value.trim(), m=document.getElementById('auth-msg'); if(!u||!p)return m.innerText="Isi semua"; m.innerText="Loading..."; try { const r=await fetch(`${CONFIG.workerUrl}/api/member/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:await hashString(u),password:await hashPass(p)})}); const j=await r.json(); if(r.ok&&j.status==='Success'){ currentUser={username:await hashString(u),password:await hashPass(p),display_name:u,bookmarks:j.user.bookmarks,history:j.user.history}; localStorage.setItem('user_auth',JSON.stringify(currentUser)); m.innerText="Sukses"; setTimeout(()=>navigateTo('?page=profile'),500); } else m.innerText=j.error||"Gagal"; } catch(e){m.innerText="Error";} }
-        async function handleRegister() { const u=document.getElementById('reg-user').value.trim(), p=document.getElementById('reg-pass').value.trim(), m=document.getElementById('auth-msg'); if(u.length<3||p.length<3)return m.innerText="Min 3 char"; m.innerText="Daftar..."; try { const r=await fetch(`${CONFIG.workerUrl}/api/member/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:await hashString(u),password:await hashPass(p)})}); const j=await r.json(); if(r.ok&&j.status==='Success'){ currentUser={username:await hashString(u),password:await hashPass(p),display_name:u,bookmarks:[],history:[]}; localStorage.setItem('user_auth',JSON.stringify(currentUser)); m.innerText="Sukses"; setTimeout(()=>navigateTo('?page=profile'),500); } else m.innerText=j.error||"Gagal"; } catch(e){m.innerText="Error";} }
-        async function syncDataToServer(nP=null) { if(!currentUser)return; try{ await fetch(`${CONFIG.workerUrl}/api/member/sync`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,password:currentUser.password,bookmarks:currentUser.bookmarks,history:currentUser.history,newPassword:nP})}); if(nP){currentUser.password=nP;localStorage.setItem('user_auth',JSON.stringify(currentUser));} }catch(e){} }
-        async function changeUserPassword() { const o=document.getElementById('user-old-pass').value.trim(), n=document.getElementById('user-new-pass').value.trim(); if(!o||!n)return alert("Isi"); if(await hashPass(o)!==currentUser.password)return alert("Pass lama salah"); await syncDataToServer(await hashPass(n)); alert("Sukses"); }
-        function userLogout() { currentUser=null; localStorage.removeItem('user_auth'); navigateTo('/'); }
-        function switchAuthMode(m) { const l=document.getElementById('tab-login'), r=document.getElementById('tab-register'), fL=document.getElementById('form-login'), fR=document.getElementById('form-register'); document.getElementById('auth-msg').innerText=""; if(m==='login'){fL.classList.remove('hide');fR.classList.add('hide');l.classList.add('border-blue-500','text-white');l.classList.remove('text-gray-400');r.classList.remove('border-blue-500','text-white');r.classList.add('text-gray-400');}else{fR.classList.remove('hide');fL.classList.add('hide');r.classList.add('border-blue-500','text-white');r.classList.remove('text-gray-400');l.classList.remove('border-blue-500','text-white');l.classList.add('text-gray-400');} }
+        function renderProfile() { document.getElementById('profile-name').innerText = currentUser?currentUser.display_name:"User"; document.getElementById('tab-p-bookmark').className=`tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab==='bookmark'?'active':'text-gray-500'}`; document.getElementById('tab-p-history').className=`tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab==='history'?'active':'text-gray-500'}`; const c=document.getElementById('profile-content-list'); c.innerHTML=""; let data=[]; if(currentProfileTab==='bookmark') data=(currentUser.bookmarks||[]).map(id=>appData.donghua.find(d=>d.id==id)).filter(Boolean); else data=(currentUser.history||[]).map(h=>{const d=appData.donghua.find(x=>x.id==h.id); return d?{...d,lastEp:h.ep}:null}).filter(Boolean); if(data.length===0) c.innerHTML=`<div class="col-span-full text-center text-gray-500 text-xs py-10">Kosong</div>`; data.forEach(i=>{ c.innerHTML+=`<div onclick="${currentProfileTab==='history'?`navigateTo('?page=watch&id=${i.id}&ep=${i.lastEp}')`:`openSynopsisAndTrack('${i.id}')`}" class="relative cursor-pointer active:scale-95 transition"><div class="rounded overflow-hidden bg-slate-800 poster-wrapper"><img src="${i.image}" alt="${i.title}" loading="lazy" class="poster-card" onload="this.classList.add('loaded')"><div class="absolute top-1 right-1 ${currentProfileTab==='history'?'bg-green-600':'bg-pink-600'} text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">${currentProfileTab==='history'?'EP '+i.lastEp:'♥'}</div><div class="p-2"><h4 class="text-white text-[10px] font-bold truncate">${i.title}</h4></div></div></div>`; }); }
+        function switchProfileTab(t) { currentProfileTab=t; renderProfile(); }
 
         function doSearch(v) { const b=document.getElementById('search-results'); if(!v){b.classList.add('hide');return;} const r=appData.donghua.filter(d=>d.title.toLowerCase().includes(v.toLowerCase())).slice(0,5); b.innerHTML=""; if(r.length===0)b.innerHTML="<div class='p-2 text-center text-gray-500 text-xs'>Nihil</div>"; r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="flex gap-2 p-2 border-b border-slate-700 cursor-pointer hover:bg-slate-700"><img src="${i.image}" alt="${i.title}" width="32" height="40" class="w-8 h-10 object-cover rounded"><div class="text-xs text-white font-bold">${i.title}</div></div>`}); b.classList.remove('hide'); }
         document.addEventListener('click', e=>{if(!e.target.closest('.relative.max-w-md'))document.getElementById('search-results').classList.add('hide')});
