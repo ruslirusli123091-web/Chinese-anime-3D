@@ -7,25 +7,16 @@
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia. Update setiap hari, gratis.">
     <meta name="theme-color" content="#0f172a">
     
-    <!-- PRECONNECT -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://backup3d.ruslirusli123091.workers.dev">
-    
-    <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- ICON -->
     <link rel="icon" href="favicon.ico" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json?v=3">
     
     <style>
         body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         
-        /* OPTIMASI GAMBAR (CLS FIX) */
+        /* LAYOUT & GAMBAR */
         .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; background-color: #1e293b; overflow: hidden; }
         .poster-card { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; opacity: 0; transition: opacity 0.3s ease-in; }
         .poster-card.loaded { opacity: 1; }
@@ -35,26 +26,14 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
         
-        /* UI ELEMENTS */
-        .sched-btn.active { background-color: #0ea5e9; color: white; border-color: #0284c7; }
-        .nav-item.active svg { color: #3b82f6; fill: rgba(59, 130, 246, 0.2); }
-        .nav-item.active span { color: #3b82f6; font-weight: bold; }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-        .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* GRIDS & LAYOUT */
-        .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
-        @media (min-width: 1024px) { .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; } .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; } }
-        
         /* BUTTONS */
         .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; min-width: 40px; min-height: 40px; }
         .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
         .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
         .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); transform: scale(1.05); }
-        
         .server-btn { font-size: 11px; padding: 6px 12px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer; transition: all 0.2s; min-height: 36px; }
         .server-btn.active { background: #3b82f6; color: white; border-color: #2563eb; }
+        .sched-btn.active { background-color: #0ea5e9; color: white; border-color: #0284c7; }
         
         /* BANNER */
         .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
@@ -64,17 +43,23 @@
         .dot.active { background-color: #3b82f6; transform: scale(1.5); opacity: 1; }
         
         /* CHAT */
-        .chat-bubble { margin-bottom: 8px; font-size: 0.75rem; }
-        .chat-user { font-weight: bold; color: #60a5fa; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; }
+        .chat-bubble { margin-bottom: 8px; font-size: 0.75rem; background: #1e293b; border-radius: 6px; padding: 6px; border: 1px solid #334155; }
+        .chat-user { font-weight: bold; color: #60a5fa; font-size: 0.7rem; display: flex; align-items: center; justify-content: space-between; gap: 4px; }
         .chat-time { color: #64748b; font-weight: normal; font-size: 0.6rem; }
-        .chat-text { color: #e2e8f0; background: #1e293b; padding: 6px 10px; border-radius: 4px; display: inline-block; margin-top: 2px; max-width: 100%; word-wrap: break-word; line-height: 1.4; }
+        .chat-text { color: #e2e8f0; margin-top: 2px; display: block; word-wrap: break-word; line-height: 1.4; }
+        
+        /* NAV */
+        .nav-item.active svg { color: #3b82f6; fill: rgba(59, 130, 246, 0.2); }
+        .nav-item.active span { color: #3b82f6; font-weight: bold; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none bg-slate-900"> 
 
-    <!-- HEADER -->
     <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 h-16 px-4 flex items-center justify-between gap-3 shadow-lg">
-        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0">
+        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0" aria-label="Ke Beranda">
             <img src="logo.png" alt="CA3D Logo" width="40" height="40" class="h-10 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span class="text-lg font-black italic bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent tracking-tighter hidden">Chinese<span class="text-white not-italic font-bold">3D</span></span>
         </a>
@@ -111,7 +96,7 @@
             <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
 
-        <!-- AUTH PAGE (UPDATED: PASSWORD TOGGLE) -->
+        <!-- AUTH PAGE (WITH PASSWORD TOGGLE) -->
         <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
             <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
                 <div class="flex mb-6 border-b border-slate-700">
@@ -119,7 +104,7 @@
                     <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-3 text-center font-bold text-gray-400">Daftar</button>
                 </div>
                 
-                <!-- LOGIN -->
+                <!-- LOGIN FORM -->
                 <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                     <input type="text" id="login-user" placeholder="Username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
                     <div class="relative">
@@ -129,7 +114,7 @@
                     <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500 min-h-[44px]">Masuk</button>
                 </form>
                 
-                <!-- REGISTER -->
+                <!-- REGISTER FORM -->
                 <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide">
                     <input type="text" id="reg-user" placeholder="Username Baru" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
                     <div class="relative">
@@ -142,7 +127,7 @@
             </div>
         </div>
 
-        <!-- PROFILE PAGE (UPDATED: ADMIN MODE + PASSWORD TOGGLE) -->
+        <!-- PROFILE PAGE (UPDATED: ADMIN TOGGLE) -->
         <div id="view-profile" class="hide">
             <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg">
                 <div class="flex items-center gap-3">
@@ -173,7 +158,7 @@
                 </div>
             </div>
 
-            <!-- TOMBOL ADMIN MODE -->
+            <!-- TOMBOL ADMIN (AKAN BERUBAH JIKA SUDAH LOGIN DI ADMIN PANEL) -->
             <div class="mt-8 text-center pt-6 border-t border-slate-800">
                 <button onclick="activateAdminMode()" id="btn-admin-mode" class="text-xs text-gray-600 hover:text-gray-400 underline">Mode Admin</button>
             </div>
@@ -263,7 +248,10 @@
         let currentPage = 1; const ITEMS_PER_PAGE = 18;
         let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
         let activeScheduleDay = 'Senin';
-        let adminPass = localStorage.getItem('ca3d_admin_pass'); // SAVE ADMIN PASS
+        
+        // === FIX ADMIN AUTO LOGIN ===
+        // Cek dua-duanya: Login dari tombol Mode Admin (ca3d_admin_pass) ATAU Login dari Panel Admin (admin_pass)
+        let adminPass = localStorage.getItem('ca3d_admin_pass') || localStorage.getItem('admin_pass');
 
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
@@ -280,33 +268,33 @@
         // --- FITUR BARU: ADMIN MODE ---
         function activateAdminMode() {
             if(adminPass) {
-                if(confirm("Nonaktifkan Mode Admin?")) {
+                if(confirm("Logout dari Mode Admin?")) {
                     localStorage.removeItem('ca3d_admin_pass');
+                    localStorage.removeItem('admin_pass'); // Clear both
                     location.reload();
                 }
                 return;
             }
-            const p = prompt("Password Admin:");
+            const p = prompt("Masukkan Password Admin:");
             if(p) {
-                // Verifikasi ke worker (Simple Check)
                 fetch(`${CONFIG.workerUrl}/api/verify-session`, { method:'POST', headers: {'X-Admin-Pass':p} })
                 .then(r => {
                     if(r.ok) { localStorage.setItem('ca3d_admin_pass', p); alert("Admin Mode ON"); location.reload(); }
-                    else alert("Salah");
+                    else alert("Password Salah");
                 });
             }
         }
 
         async function admDel(id) {
-            if(!confirm("Hapus?")) return;
+            if(!confirm("Hapus Chat ini?")) return;
             await fetch(`${CONFIG.workerUrl}/api/chat`, { method:'PUT', headers:{'Content-Type':'application/json','X-Admin-Pass':adminPass}, body:JSON.stringify({action:'delete',commentId:id}) });
             const p=new URLSearchParams(window.location.search); fetchChatData().then(()=>renderChat(p.get('id'),p.get('ep')));
         }
 
         async function admBan(u) {
-            if(!confirm(`Ban ${u}?`)) return;
+            if(!confirm(`Ban User ${u}?`)) return;
             await fetch(`${CONFIG.workerUrl}/api/users`, { method:'PUT', headers:{'Content-Type':'application/json','X-Admin-Pass':adminPass}, body:JSON.stringify({action:'ban',username:u}) });
-            alert("Banned");
+            alert("User Banned");
         }
 
         // INIT
@@ -317,7 +305,7 @@
             activeScheduleDay = daysMap[new Date().getDay()];
             renderSchedButtons();
             
-            if(adminPass) document.getElementById('btn-admin-mode').innerText = "✅ Mode Admin ON (Klik Logout)";
+            if(adminPass) document.getElementById('btn-admin-mode').innerText = "✅ Logout Admin";
             
             await fetchContent();
             checkRoute();
