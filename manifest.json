@@ -1,6 +1,7 @@
 {
-  "name": "Chinese Anime 3D Sub Ai",
-  "short_name": "Chinese3D",
+  "name": "Chinese Anime 3D",
+  "short_name": "CA3D",
+  "description": "Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -9,14 +10,14 @@
   "icons": [
     {
       "src": "web-app-manifest-192x192.png",
-      "sizes": "192x192",
       "type": "image/png",
+      "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
       "src": "web-app-manifest-512x512.png",
-      "sizes": "512x512",
       "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any maskable"
     }
   ]
