@@ -1,76 +1,24 @@
 {
-  "background_color": "#ffffff",
+  "name": "Chinese Anime 3D",
+  "short_name": "CA3D",
   "description": "Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "ca3d",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "ca3d",
   "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
   "theme_color": "#0f172a",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://ca3d.site/favicon.ico",
-      "type": "image/x-icon",
-      "isSquare": false,
-      "isPng": false,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 0,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
-    },
-    {
-      "src": "https://ca3d.site/favicon.svg",
-      "type": "image/svg+xml",
-      "isSquare": false,
-      "isPng": false,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 0,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
-    },
-    {
-      "src": "https://ca3d.site/favicon-96x96.png",
+      "src": "https://ca3d.site/web-app-manifest-192x192.png",
       "type": "image/png",
-      "sizes": "96x96",
-      "isSquare": true,
-      "isPng": true,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 96,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
-      "src": "https://ca3d.site/apple-touch-icon.png",
+      "src": "https://ca3d.site/web-app-manifest-512x512.png",
       "type": "image/png",
-      "sizes": "180x180",
-      "isSquare": true,
-      "isPng": true,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 180,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
-    },
-    {
-      "src": "https://ca3d.site/favicon.ico",
-      "type": "image/x-icon",
-      "isSquare": false,
-      "isPng": false,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 0,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ]
 }
