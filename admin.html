@@ -3,411 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Chinese Anime 3D</title>
-    <meta name="theme-color" content="#7f1d1d">
+    <title>Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo</title>
+    <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
+    <meta name="theme-color" content="#0f172a">
+    
+    <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ICON -->
+    <link rel="icon" href="favicon.ico" sizes="any">
+    
     <style>
-        body { background-color: #0f172a; color: #cbd5e1; }
+        body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
-        /* Style khusus form admin */
-        .day-select-btn { background-color: #1e293b; border: 1px solid #475569; color: #94a3b8; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: all 0.2s; user-select: none; }
-        .day-select-btn.selected { background-color: #2563eb; color: white; border-color: #3b82f6; box-shadow: 0 0 5px rgba(37, 99, 235, 0.5); }
-        input[type="datetime-local"] { color-scheme: dark; cursor: pointer; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+        .poster-card { aspect-ratio: 2/3; object-fit: cover; width: 100%; transition: transform 0.3s; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        
+        /* UI ELEMENTS */
+        .sched-btn.active { background-color: #0ea5e9; color: white; border-color: #0284c7; }
+        .nav-item.active svg { color: #3b82f6; fill: rgba(59, 130, 246, 0.2); }
+        .nav-item.active span { color: #3b82f6; font-weight: bold; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* GRIDS */
+        .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
+        @media (min-width: 1024px) {
+            .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; }
+            .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; }
+        }
+        
+        /* BUTTONS */
+        .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+        .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
+        .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); transform: scale(1.05); }
+
+        /* SERVER BUTTONS */
+        .server-btn { font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; transition: all 0.2s; }
+        .server-btn.active { background: #3b82f6; color: white; border-color: #2563eb; }
+        .server-btn:hover:not(.active) { background: #334155; color: white; }
+
+        /* BANNER */
+        .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
+        .banner-slide.active { opacity: 1; pointer-events: auto; z-index: 10; }
+        .banner-overlay { background: linear-gradient(to top, #0f172a 10%, transparent 90%); }
+        .dot { transition: all 0.3s; opacity: 0.5; background-color: #6b7280; }
+        .dot.active { background-color: #3b82f6; transform: scale(1.5); opacity: 1; }
+        
+        /* CHAT */
+        .chat-bubble { margin-bottom: 8px; font-size: 0.75rem; }
+        .chat-user { font-weight: bold; color: #60a5fa; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; }
+        .chat-time { color: #64748b; font-weight: normal; font-size: 0.6rem; }
+        .chat-text { color: #e2e8f0; background: #1e293b; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 2px; max-width: 100%; word-wrap: break-word; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans text-sm pb-10">
+<body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none"> 
 
-    <nav class="bg-red-900/90 backdrop-blur p-3 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center px-2">
-            <span class="font-bold text-white flex items-center gap-2">🔒 Admin Control Panel</span>
-            <div class="flex gap-2">
-                <a href="/" class="bg-slate-800 text-gray-300 px-3 py-1 rounded text-xs hover:bg-slate-700">Lihat Web</a>
-                <button onclick="adminLogout()" class="bg-red-950 text-red-200 px-3 py-1 rounded border border-red-700 hover:bg-red-800 transition text-xs">Exit</button>
+    <!-- HEADER (FIXED SEARCH AUTOFILL) -->
+    <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 h-16 px-4 flex items-center justify-between gap-3 shadow-lg">
+        <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="flex-shrink-0">
+            <img src="logo.png" alt="CA3D" class="h-10 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="text-lg font-black italic bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent tracking-tighter hidden">Chinese<span class="text-white not-italic font-bold">3D</span></span>
+        </a>
+        <div class="relative flex-1 max-w-md">
+            <!-- Gunakan nama random untuk 'name' agar browser tidak autofill username -->
+            <input 
+                type="search" 
+                id="site_search_input_v2" 
+                name="search_query_random_x99" 
+                autocomplete="off" 
+                role="searchbox"
+                oninput="doSearch(this.value)" 
+                placeholder="Cari Donghua..." 
+                class="w-full bg-slate-800 text-gray-200 text-xs rounded-full pl-4 pr-4 py-2.5 border border-slate-700 focus:border-blue-500 outline-none transition focus:bg-slate-900"
+            >
+            <div id="search-results" class="absolute top-full left-0 w-full mt-2 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 max-h-80 overflow-y-auto hide z-50 p-2"></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-3 flex-grow relative max-w-5xl">
+        <div id="loading" class="fixed inset-0 bg-slate-900/80 z-[60] flex justify-center items-center backdrop-blur-sm hide"><div class="loader"></div></div>
+        
+        <!-- HOME PAGE -->
+        <div id="view-home" class="hide animate-fade">
+            <div id="hero-banner-container" class="hide mb-6 w-full rounded-2xl overflow-hidden relative shadow-2xl border border-slate-800 bg-slate-900 aspect-[16/9] sm:h-80 group">
+                <div id="banner-wrapper" class="w-full h-full relative"></div>
+                <div id="banner-dots" class="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20"></div>
             </div>
+            
+            <h2 id="list-title" class="text-sm font-bold mb-4 text-white flex items-center gap-2"><span class="w-1 h-4 bg-blue-500 rounded-full"></span> Update Terbaru</h2>
+            <div id="donghua-list" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"></div>
+            <div id="pagination-container" class="mt-8 flex justify-center items-center gap-2 flex-wrap pb-4"></div>
+            <div class="mt-8 pt-6 border-t border-slate-800"><h3 class="font-bold text-white mb-4 pl-2 border-l-4 border-red-500 text-sm">Sedang Populer 🔥</h3><div id="popular-list-home" class="space-y-3"></div></div>
+        </div>
+
+        <!-- SCHEDULE PAGE -->
+        <div id="view-schedule" class="hide">
+            <h2 class="text-base font-bold mb-4 text-white">Jadwal Rilis</h2>
+            <div class="grid grid-cols-4 gap-2 mb-6">
+                <button onclick="switchScheduleTab('Senin')" id="btn-Senin" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Senin</button><button onclick="switchScheduleTab('Selasa')" id="btn-Selasa" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Selasa</button><button onclick="switchScheduleTab('Rabu')" id="btn-Rabu" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Rabu</button><button onclick="switchScheduleTab('Kamis')" id="btn-Kamis" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Kamis</button><button onclick="switchScheduleTab('Jumat')" id="btn-Jumat" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Jumat</button><button onclick="switchScheduleTab('Sabtu')" id="btn-Sabtu" class="sched-btn bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Sabtu</button><button onclick="switchScheduleTab('Minggu')" id="btn-Minggu" class="sched-btn col-span-2 bg-slate-800 text-gray-400 border border-slate-700 rounded py-2 text-xs font-bold hover:bg-slate-700 transition">Minggu</button>
+            </div>
+            <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- AUTH PAGE -->
+        <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
+            <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
+                <div class="flex mb-6 border-b border-slate-700"><button onclick="switchAuthMode('login')" id="tab-login" class="flex-1 py-2 text-center font-bold text-white border-b-2 border-blue-500">Masuk</button><button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-2 text-center font-bold text-gray-500">Daftar</button></div>
+                <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4"><input type="text" id="login-user" placeholder="Username" autocomplete="username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500">Masuk</button></form>
+                <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide"><input type="text" id="reg-user" placeholder="Username Baru" autocomplete="off" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><input type="password" id="reg-pass" placeholder="Password" autocomplete="new-password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs"><button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500">Buat Akun</button></form>
+                <p id="auth-msg" class="text-center text-xs mt-4 h-4"></p>
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="view-profile" class="hide">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-lg">👤</div><div><p class="text-gray-400 text-[10px]">Halo,</p><h1 class="text-lg font-bold text-white leading-none" id="profile-name">User</h1></div></div><button onclick="userLogout()" class="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/30 text-xs font-bold">Logout</button></div>
+            <div class="flex gap-4 border-b border-slate-700 mb-4"><button onclick="switchProfileTab('bookmark')" id="tab-p-bookmark" class="tab-btn active flex-1 pb-3 font-bold text-center text-xs uppercase">Favorit</button><button onclick="switchProfileTab('history')" id="tab-p-history" class="tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase">Riwayat</button></div>
+            <div id="profile-content-list" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-8"></div>
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 mt-6"><h3 class="text-sm font-bold text-white mb-3">🔐 Ganti Password</h3><div class="flex flex-col gap-3"><input type="password" id="user-old-pass" placeholder="Pass Lama" class="bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white"><input type="password" id="user-new-pass" placeholder="Pass Baru" class="bg-slate-900 border border-slate-600 p-2 rounded text-xs text-white"><button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded text-xs font-bold">Simpan</button></div></div>
+        </div>
+
+        <!-- SYNOPSIS PAGE -->
+        <div id="view-synopsis" class="hide">
+            <div class="bg-slate-800/50 rounded-xl p-4 backdrop-blur-sm border border-slate-700/50 mb-6">
+                <div class="flex gap-4 mb-4">
+                    <div class="w-28 flex-shrink-0"><img id="syn-image" src="" alt="Poster" class="w-full rounded-lg shadow-lg poster-card bg-slate-700"></div>
+                    <div class="flex-1 min-w-0 flex flex-col"><h1 id="syn-title" class="text-base font-bold text-white mb-1 leading-tight">Title</h1><div class="flex items-center gap-2 text-[10px] text-gray-400 mb-3"><span id="syn-total-ep-info" class="bg-slate-700 px-1.5 py-0.5 rounded text-white">0 Eps</span><span id="syn-views">0 Views</span></div><div id="synopsis-buttons" class="mt-auto flex gap-2"></div></div>
+                </div>
+                <p id="syn-desc" class="text-gray-400 text-xs leading-relaxed mb-4 line-clamp-4">Desc...</p>
+                <button id="btn-start-watch" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs mb-3 shadow-lg shadow-blue-900/20">MULAI NONTON</button>
+                <div class="border-t border-slate-700 pt-4 mt-2"><h3 class="font-bold text-white text-xs mb-3">DAFTAR EPISODE</h3><div id="syn-episodes" class="ep-grid-custom ep-grid-synopsis max-h-60 overflow-y-auto pr-1 pb-2"></div></div>
+            </div>
+            <div class="mt-6"><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Rekomendasi 🔥</h3><div id="popular-list-syn" class="space-y-3"></div></div>
+        </div>
+
+        <!-- WATCH PAGE (WITH SERVER SELECTION) -->
+        <div id="view-watch" class="hide">
+            <div class="lg:flex lg:gap-6">
+                <div class="lg:w-[75%]">
+                    <!-- VIDEO PLAYER -->
+                    <div class="aspect-video w-full relative bg-black shadow-lg">
+                        <iframe id="video-player" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    
+                    <!-- SERVER SELECTOR -->
+                    <div class="bg-slate-900 border-x border-b border-slate-800 p-2">
+                        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="server-list-container">
+                            <!-- Server buttons will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border-b border-slate-800 pb-3 mb-3">
+                        <div class="flex justify-between items-start mt-3 mb-2 px-1">
+                            <h2 id="watch-title" class="text-sm font-bold text-white flex-1 mr-2 leading-tight">Title</h2>
+                            <div id="watch-page-buttons" class="flex items-center gap-3"></div>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 px-1">
+                            <span id="watch-views">0 Views</span>
+                            <a id="back-link" href="#" class="text-blue-500">Detail &rarr;</a>
+                        </div>
+                    </div>
+                    <div class="mt-4 mb-8 bg-slate-900 rounded-lg border border-slate-800 p-3"><h3 class="font-bold text-white mb-2 text-xs flex items-center gap-2">Live Chat</h3><div id="chat-container" class="h-48 overflow-y-auto pr-2 mb-2 space-y-2 border border-slate-800/50 rounded bg-slate-950/30 p-2 text-xs"></div><div id="chat-input-area"></div></div>
+                </div>
+                <div class="lg:w-[25%] lg:h-full">
+                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl"><h3 class="font-bold text-white text-xs mb-2">Pilih Episode</h3><div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto pb-2"></div></div>
+                    <div><h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Lanjut Nonton 🔥</h3><div id="popular-list-watch" class="space-y-3"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="fixed bottom-0 left-0 w-full bg-slate-900 border-t border-slate-800 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+        <div class="flex justify-around items-center h-14">
+            <button onclick="navigateTo('/')" id="nav-home" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[9px]">Beranda</span></button>
+            <button onclick="navigateTo('?page=schedule')" id="nav-schedule" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-[9px]">Jadwal</span></button>
+            <button onclick="navigateToAccount()" id="nav-account" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 transition active:scale-95"><svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[9px]">Akun</span></button>
         </div>
     </nav>
 
-    <main class="container mx-auto p-4 max-w-4xl flex-grow">
-        
-        <!-- LOGIN VIEW -->
-        <div id="view-admin-login" class="flex justify-center items-center h-[80vh]">
-            <div class="bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700 text-center w-full max-w-sm">
-                <h2 class="font-bold text-2xl text-red-500 mb-6">Admin Access</h2>
-                <form onsubmit="event.preventDefault(); adminLogin();">
-                    <input type="text" id="admin-user" placeholder="Username" autocomplete="username" class="block w-full mb-4 p-3 bg-slate-900 rounded border border-slate-600 text-white text-sm focus:border-red-500 outline-none">
-                    <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password" class="block w-full mb-6 p-3 bg-slate-900 rounded border border-slate-600 text-white text-sm focus:border-red-500 outline-none">
-                    <button class="bg-red-600 px-4 py-3 rounded text-white font-bold w-full hover:bg-red-500 transition shadow-lg">MASUK</button>
-                </form>
-                <p id="admin-msg" class="text-xs text-red-400 mt-4 h-4"></p>
-            </div>
-        </div>
-
-        <!-- PANEL DASHBOARD -->
-        <div id="view-admin-panel" class="hide">
-            
-            <!-- UPDATE PASSWORD ADMIN -->
-            <div class="bg-slate-800 p-4 rounded-lg mb-6 border border-slate-700">
-                <h3 class="font-bold text-red-400 mb-3 text-xs uppercase tracking-wider border-b border-slate-700 pb-2">Ganti Akun Admin</h3>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="admin-edit-user" placeholder="Username Baru" autocomplete="new-password" class="bg-slate-900 p-2 rounded text-xs text-white border border-slate-600 flex-1">
-                    <input type="password" id="admin-edit-pass" placeholder="Password Baru" autocomplete="new-password" class="bg-slate-900 p-2 rounded text-xs text-white border border-slate-600 flex-1">
-                    <button onclick="updateAdminCredentials()" class="bg-red-700 text-white px-4 py-2 rounded text-xs font-bold hover:bg-red-600 transition">Simpan</button>
-                </div>
-            </div>
-
-            <!-- FORM INPUT DONGHUA -->
-            <div class="bg-slate-800 p-5 rounded-lg mb-6 border border-slate-700 shadow-xl">
-                <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
-                    <h3 class="font-bold text-blue-400 text-sm uppercase tracking-wider">Input / Edit Donghua</h3>
-                    <div class="flex gap-2">
-                         <button onclick="downloadSitemap()" class="bg-yellow-600 hover:bg-yellow-500 text-white text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">📥 Sitemap</button>
-                         <button onclick="clearForm()" class="bg-gray-600 px-3 py-1.5 rounded font-bold text-white text-xs hover:bg-gray-500">Reset Form</button>
-                    </div>
-                </div>
-                
-                <input type="hidden" id="edit-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="space-y-3">
-                        <input type="text" id="inp-title" placeholder="Judul Anime" class="w-full p-2.5 bg-slate-900 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
-                        <input type="text" id="inp-img" placeholder="Poster URL (https://...)" class="w-full p-2.5 bg-slate-900 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
-                        <textarea id="inp-desc" placeholder="Sinopsis..." class="w-full p-2.5 bg-slate-900 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none" rows="3"></textarea>
-                        <textarea id="inp-notify-msg" placeholder="Pesan Telegram (Opsional)..." class="w-full p-2.5 bg-slate-900 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none" rows="2"></textarea>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                            <label class="text-[10px] text-gray-400 block mb-2 uppercase font-bold">Hari Tayang</label>
-                            <div class="flex flex-wrap gap-2" id="day-selector-container">
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Senin" class="day-select-btn">Senin</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Selasa" class="day-select-btn">Selasa</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Rabu" class="day-select-btn">Rabu</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Kamis" class="day-select-btn">Kamis</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Jumat" class="day-select-btn">Jumat</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Sabtu" class="day-select-btn">Sabtu</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Minggu" class="day-select-btn">Minggu</button>
-                                <button type="button" onclick="toggleDaySelection(this)" data-val="Random" class="day-select-btn">Random</button>
-                            </div>
-                            <input type="hidden" id="inp-day">
-                        </div>
-                        <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                            <label class="text-[10px] text-gray-400 block mb-2 uppercase font-bold">⏳ Auto Publish (Waktu Jakarta)</label>
-                            <div class="flex gap-2">
-                                <input type="datetime-local" id="inp-schedule-time" class="flex-1 p-2 bg-slate-800 rounded border border-slate-600 text-xs text-white outline-none">
-                                <button type="button" onclick="document.getElementById('inp-schedule-time').value = ''" class="bg-slate-700 hover:bg-slate-600 text-gray-300 px-3 rounded border border-slate-600 text-xs">Clear</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 p-3 rounded border border-slate-700 mb-4">
-                    <div class="flex justify-between mb-2 border-b border-slate-800 pb-2">
-                        <span class="text-xs font-bold text-gray-300">List Episode</span>
-                        <button type="button" onclick="addEpisodeRow()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded font-bold transition">+ Tambah Episode</button>
-                    </div>
-                    <div id="episode-container" class="max-h-60 overflow-y-auto space-y-1 pr-2 custom-scroll"></div>
-                </div>
-
-                <button onclick="saveDonghua()" class="w-full bg-green-600 py-3 rounded font-bold text-white text-sm hover:bg-green-500 shadow-lg shadow-green-900/20 transition">SIMPAN DATA</button>
-            </div>
-
-            <!-- TABEL LIST -->
-            <div class="overflow-hidden bg-slate-800 rounded-lg border border-slate-700 shadow-xl">
-                <table class="w-full text-left text-xs text-gray-400">
-                    <thead class="bg-slate-700 text-white font-bold uppercase">
-                        <tr>
-                            <th class="p-3">Cover</th>
-                            <th class="p-3">Info Donghua</th>
-                            <th class="p-3 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-list" class="divide-y divide-slate-700"></tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- POPUP RE-AUTH -->
-    <div id="reauth-modal" class="hide fixed inset-0 bg-slate-900/90 z-[70] flex items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-slate-800 w-full max-w-sm rounded-xl p-6 border border-slate-700 shadow-2xl">
-            <h3 class="font-bold text-white text-lg mb-2">Sesi Berakhir</h3>
-            <p class="text-xs text-slate-400 mb-4">Masukkan password admin untuk lanjut menyimpan.</p>
-            <form onsubmit="event.preventDefault(); handleReauth();" class="space-y-3">
-                <input type="password" id="reauth-pass" placeholder="Password Admin" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-xs">
-                <p id="reauth-msg" class="text-red-400 text-xs h-4"></p>
-                <div class="flex gap-2">
-                    <button type="button" onclick="adminLogout()" class="flex-1 bg-slate-600 py-2.5 rounded-lg font-bold text-white text-xs hover:bg-slate-500">Logout</button>
-                    <button type="submit" class="flex-1 bg-blue-600 py-2.5 rounded-lg font-bold text-white text-xs hover:bg-blue-500">Lanjutkan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
+        // CONFIG
         const CONFIG = { workerUrl: "https://backup3d.ruslirusli123091.workers.dev" }; 
-        let appData = { donghua: [] };
-        let onReauthSuccess = null;
+        
+        // STATE
+        let appData = { donghua: [] }, chatData = { comments: [] }, currentUser = null, currentUserNameDisplay = "";
+        let currentPage = 1; const ITEMS_PER_PAGE = 18;
+        let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
+        let activeScheduleDay = 'Senin';
+        let isAdminLoggedIn = false; 
 
-        // Helper functions duplicated to work standalone
+        // UTILS
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
 
-        window.onload = function() {
-            if (sessionStorage.getItem('admin_session') === 'active') {
-                document.getElementById('view-admin-login').classList.add('hide');
-                document.getElementById('view-admin-panel').classList.remove('hide');
-                fetchDataForAdmin();
-            }
-        };
+        // INIT
+        window.addEventListener('load', async () => {
+            const savedUser = localStorage.getItem('user_session');
+            if (savedUser) { try { currentUser = JSON.parse(savedUser); currentUserNameDisplay = localStorage.getItem('user_name_display') || "Member"; } catch (e) { currentUser = null; } }
+            
+            const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            activeScheduleDay = daysMap[new Date().getDay()];
+            
+            await fetchContent();
+            checkRoute();
+        });
+        window.addEventListener('hashchange', checkRoute);
+        window.addEventListener('popstate', checkRoute);
 
-        async function fetchDataForAdmin() {
-            const secretPass = sessionStorage.getItem('admin_secret_temp');
+        // ROUTING
+        function checkRoute() {
+            const p = new URLSearchParams(window.location.search), page = p.get('page'), id = p.get('id'), ep = p.get('ep');
+            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hide'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (bannerInterval) clearInterval(bannerInterval);
+
+            if (page === 'auth') {
+                if (currentUser) { navigateTo('?page=profile'); return; }
+                document.title = "Login / Daftar | CA3D";
+                document.getElementById('view-auth').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); switchAuthMode('login');
+            } else if (page === 'profile') {
+                if (!currentUser) { navigateTo('?page=auth'); return; }
+                document.title = "Profil Saya | CA3D";
+                document.getElementById('view-profile').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); renderProfile();
+            } else if (page === 'schedule') {
+                document.title = "Jadwal Rilis | CA3D";
+                document.getElementById('view-schedule').classList.remove('hide'); document.getElementById('nav-schedule').classList.add('active');
+                switchScheduleTab(activeScheduleDay);
+            } else if (page === 'synopsis' && id) {
+                document.getElementById('view-synopsis').classList.remove('hide'); loadSynopsis(id);
+            } else if (page === 'watch' && id && ep) {
+                document.getElementById('view-watch').classList.remove('hide'); loadWatch(id, ep);
+            } else {
+                document.title = "Chinese Anime 3D Sub Ai";
+                document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active');
+                renderHome();
+            }
+            window.scrollTo(0, 0);
+        }
+        function navigateTo(u) { window.history.pushState({}, '', u); checkRoute(); }
+        function navigateToAccount() { if (currentUser) navigateTo('?page=profile'); else navigateTo('?page=auth'); }
+
+        // DATA
+        async function fetchContent() {
+            document.getElementById('loading').classList.remove('hide');
             try {
-                // Header ini PENTING agar backend mengirim item yang di-schedule
-                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { headers: { 'X-Admin-Pass': secretPass } });
+                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`);
                 const j = await r.json();
                 appData.donghua = j.donghua || [];
-                renderAdminList();
-            } catch(e) { alert("Gagal mengambil data: " + e.message); }
+            } catch (e) { console.error("Fetch content error:", e); }
+            document.getElementById('loading').classList.add('hide');
         }
 
-        async function adminLogin() {
-            const u = document.getElementById('admin-user').value.trim();
-            const p = document.getElementById('admin-pass').value.trim();
-            const msg = document.getElementById('admin-msg');
-            msg.innerText = "Verifikasi...";
+        async function fetchChatData() { try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`); const j = await r.json(); chatData = j && j.comments ? j : { comments: [] }; } catch (e) { console.error("Fetch chat error:", e); } }
+
+        // RENDER HOME
+        function renderHome() {
+            renderBanner(); 
+            const c = document.getElementById('donghua-list'); c.innerHTML = ""; 
+            const pagContainer = document.getElementById('pagination-container'); pagContainer.innerHTML = "";
             
-            const hashedUser = await hashString(u);
-            const hashedPass = await hashPass(p);
+            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+            const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
+            if (currentPage < 1) currentPage = 1; if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
             
-            try {
-                const r = await fetch(`${CONFIG.workerUrl}/api/auth`);
-                const j = await r.json();
-                const users = j.users || j.admin || [];
-                const found = users.find(x => x.username === hashedUser && x.password === hashedPass);
-                
-                if (found) {
-                    sessionStorage.setItem('admin_session', 'active');
-                    sessionStorage.setItem('admin_secret_temp', p);
-                    document.getElementById('view-admin-login').classList.add('hide');
-                    document.getElementById('view-admin-panel').classList.remove('hide');
-                    fetchDataForAdmin();
-                } else {
-                    msg.innerText = "Username / Password Salah!";
-                }
-            } catch (e) { msg.innerText = "Error Worker Connection"; }
-        }
-
-        function adminLogout() {
-            sessionStorage.clear();
-            location.reload();
-        }
-
-        function renderAdminList() {
-            const t = document.getElementById('admin-list'); 
-            t.innerHTML = ""; 
-            // Sort terbaru diatas
-            const sorted = [...appData.donghua].sort((a,b) => (b.lastUpdated||0) - (a.lastUpdated||0));
+            const start = (currentPage - 1) * ITEMS_PER_PAGE; 
+            const pageData = sorted.slice(start, start + ITEMS_PER_PAGE);
             
-            sorted.forEach(i => { 
-                const isScheduled = i.scheduledTime && i.scheduledTime > Date.now(); 
-                const statusBadge = isScheduled ? '<span class="text-[9px] bg-yellow-600 text-white px-1.5 py-0.5 rounded ml-2 font-bold animate-pulse">⏳ SCHEDULED</span>' : ''; 
-                
-                t.innerHTML += `
-                <tr class="border-b border-slate-700 hover:bg-slate-750 transition">
-                    <td class="p-3 w-14"><img src="${i.image}" class="w-10 h-14 bg-black object-cover rounded shadow"></td>
-                    <td class="p-3 text-white">
-                        <div class="font-bold text-sm">${i.title} ${statusBadge}</div>
-                        <div class="text-xs text-gray-500 mt-1">
-                            ${i.episodes?.length || 0} eps • ${i.views || 0} views • ${i.day || '-'}
-                        </div>
-                    </td>
-                    <td class="p-3 text-right">
-                        <button onclick="editData('${i.id}')" class="bg-blue-900/50 text-blue-400 border border-blue-900 px-3 py-1 rounded text-xs mr-2 hover:bg-blue-900">EDIT</button>
-                        <button onclick="deleteData('${i.id}')" class="bg-red-900/50 text-red-400 border border-red-900 px-3 py-1 rounded text-xs hover:bg-red-900">HAPUS</button>
-                    </td>
-                </tr>`; 
-            }); 
-        }
-
-        function addEpisodeRow(n = "", u = "") { 
-            const c = document.getElementById('episode-container'); 
-            const d = document.createElement('div'); 
-            d.className = "ep-row flex gap-2 items-center bg-slate-900 p-2 rounded border border-slate-700 mb-1"; 
-            d.innerHTML = `
-                <div class="flex flex-col gap-1 mr-1">
-                    <button type="button" onclick="moveEpRow(this, -1)" class="text-gray-500 hover:text-blue-400 leading-none text-[10px]">▲</button>
-                    <button type="button" onclick="moveEpRow(this, 1)" class="text-gray-500 hover:text-blue-400 leading-none text-[10px]">▼</button>
-                </div>
-                <input value="${n}" class="w-12 bg-slate-800 border border-slate-600 text-xs p-1.5 text-center ep-num text-white rounded focus:border-blue-500 outline-none" placeholder="Ep">
-                <input value="${u}" class="flex-1 bg-slate-800 border border-slate-600 text-xs p-1.5 ep-url text-white rounded focus:border-blue-500 outline-none" placeholder="URL Video (Embed/Stream)">
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-400 px-2 font-bold text-lg leading-none">×</button>
-            `; 
-            c.appendChild(d); 
-        }
-
-        function moveEpRow(btn, direction) { 
-            const row = btn.closest('.ep-row'); 
-            const container = row.parentNode; 
-            if (direction === -1 && row.previousElementSibling) container.insertBefore(row, row.previousElementSibling); 
-            else if (direction === 1 && row.nextElementSibling) container.insertBefore(row.nextElementSibling, row); 
-        }
-
-        function editData(id) { 
-            const i = appData.donghua.find(x => x.id == id); if (!i) return; 
-            document.getElementById('edit-id').value = i.id; 
-            document.getElementById('inp-title').value = i.title; 
-            document.getElementById('inp-img').value = i.image; 
-            document.getElementById('inp-desc').value = i.synopsis; 
-            document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); 
-            if (i.day) i.day.split(',').forEach(d => { const btn = document.querySelector(`.day-select-btn[data-val="${d}"]`); if(btn) btn.classList.add('selected'); }); 
-            updateHiddenDayInput();
-            
-            if (i.scheduledTime) { 
-                const d = new Date(i.scheduledTime); 
-                d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); 
-                document.getElementById('inp-schedule-time').value = d.toISOString().slice(0, 16); 
-            } else { document.getElementById('inp-schedule-time').value = ""; } 
-            
-            const c = document.getElementById('episode-container'); c.innerHTML = ""; 
-            (i.episodes || []).forEach(e => addEpisodeRow(e.ep, e.url)); 
-            document.getElementById('view-admin-panel').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function clearForm() { 
-            document.getElementById('edit-id').value = ""; 
-            document.getElementById('inp-title').value = ""; 
-            document.getElementById('inp-img').value = ""; 
-            document.getElementById('inp-desc').value = ""; 
-            document.getElementById('inp-notify-msg').value = ""; 
-            document.getElementById('inp-day').value = ""; 
-            document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); 
-            document.getElementById('inp-schedule-time').value = ""; 
-            document.getElementById('episode-container').innerHTML = ""; 
-        }
-
-        function toggleDaySelection(btn) { btn.classList.toggle('selected'); updateHiddenDayInput(); }
-        function updateHiddenDayInput() { const selected = []; document.querySelectorAll('.day-select-btn.selected').forEach(btn => selected.push(btn.getAttribute('data-val'))); document.getElementById('inp-day').value = selected.join(','); }
-
-        // --- CORE FUNCTIONS (Save, Delete, Reauth) ---
-        
-        function showReauthPopup(callback) { onReauthSuccess = callback; document.getElementById('reauth-msg').innerText = ''; document.getElementById('reauth-modal').classList.remove('hide'); document.getElementById('reauth-pass').focus(); }
-        function hideReauthPopup() { document.getElementById('reauth-modal').classList.add('hide'); document.getElementById('reauth-pass').value = ''; }
-        
-        async function handleReauth() {
-            const pass = document.getElementById('reauth-pass').value;
-            const btn = document.querySelector('#reauth-modal button[type="submit"]');
-            btn.disabled = true; btn.innerText = "Cek...";
-            try {
-                const r = await fetch(`${CONFIG.workerUrl}/api/verify-session`, { method: 'POST', headers: { 'X-Admin-Pass': pass } });
-                if (r.ok) {
-                    sessionStorage.setItem('admin_secret_temp', pass);
-                    hideReauthPopup();
-                    if (onReauthSuccess) { const cb = onReauthSuccess; onReauthSuccess = null; cb(); }
-                } else { document.getElementById('reauth-msg').innerText = 'Password salah.'; }
-            } catch (e) { document.getElementById('reauth-msg').innerText = 'Error jaringan.'; }
-            btn.disabled = false; btn.innerText = "Lanjutkan";
-        }
-
-        async function saveDonghua() {
-            const secretPass = sessionStorage.getItem('admin_secret_temp');
-            if (!secretPass) return showReauthPopup(() => saveDonghua());
-            
-            const id = document.getElementById('edit-id').value;
-            const title = document.getElementById('inp-title').value;
-            if(!title) return alert("Judul wajib diisi");
-            
-            const img = document.getElementById('inp-img').value;
-            const desc = document.getElementById('inp-desc').value;
-            const customMsg = document.getElementById('inp-notify-msg').value;
-            const day = document.getElementById('inp-day').value;
-            const scheduleInput = document.getElementById('inp-schedule-time').value;
-            const scheduledTime = scheduleInput ? new Date(scheduleInput).getTime() : null;
-            
-            let eps = []; 
-            document.querySelectorAll('#episode-container > div').forEach(r => { 
-                eps.push({ ep: r.querySelector('.ep-num').value, url: r.querySelector('.ep-url').value }) 
+            pageData.forEach(i => { 
+                const latestEp = getLatestEp(i.episodes); 
+                const card = document.createElement('a'); 
+                card.href = `?page=synopsis&id=${i.id}`;
+                card.className = "relative cursor-pointer active:scale-95 transition-transform group block";
+                card.onclick = (e) => { e.preventDefault(); openSynopsisAndTrack(i.id); };
+                card.innerHTML = `<div class="rounded-lg overflow-hidden relative bg-slate-800 shadow-lg border border-slate-700/50"><img src="${i.image}" alt="Nonton ${i.title} Sub Indo" class="poster-card transition duration-500 group-hover:scale-110" loading="lazy"><div class="absolute top-1 right-1 bg-blue-600/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">EP ${latestEp}</div><div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent p-2 pt-8"><h3 class="text-white text-[11px] font-bold truncate leading-tight">${i.title}</h3></div></div>`; 
+                c.appendChild(card); 
             });
+
+            if (totalPages > 1) { 
+                const prevBtn = document.createElement('button'); prevBtn.className = "page-btn bg-slate-800 text-white px-3 py-1 rounded border border-slate-700 mr-2 disabled:opacity-50"; prevBtn.innerHTML = "&lt;"; prevBtn.disabled = currentPage === 1; prevBtn.onclick = () => changePage(currentPage - 1); pagContainer.appendChild(prevBtn); 
+                const nextBtn = document.createElement('button'); nextBtn.className = "page-btn bg-slate-800 text-white px-3 py-1 rounded border border-slate-700 disabled:opacity-50"; nextBtn.innerHTML = "&gt;"; nextBtn.disabled = currentPage === totalPages; nextBtn.onclick = () => changePage(currentPage + 1); pagContainer.appendChild(nextBtn); 
+            }
+            renderSidebars();
+        }
+
+        function changePage(pageNum) { currentPage = pageNum; renderHome(); document.getElementById('list-title').scrollIntoView({ behavior: 'smooth' }); }
+
+        function renderBanner() {
+            const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+            const bannerContainer = document.getElementById('hero-banner-container'); 
+            const wrapper = document.getElementById('banner-wrapper'); 
+            const dotsContainer = document.getElementById('banner-dots');
             
-            const ts = Date.now();
-            const isNewEntry = !id;
-            const newItemId = id || ts.toString();
-            let newItem = { id: newItemId, title, image: img, synopsis: desc, day: day, scheduledTime: scheduledTime, episodes: eps, views: 0, lastUpdated: ts };
+            if (sorted.length === 0) { bannerContainer.classList.add('hide'); return; }
+            bannerContainer.classList.remove('hide');
+            currentBannerIndex = 0;
+            const top5 = sorted.slice(0, 5); 
+            wrapper.innerHTML = ""; dotsContainer.innerHTML = "";
             
-            const idx = appData.donghua.findIndex(x => x.id == id);
-            if (idx > -1) { 
-                newItem.views = appData.donghua[idx].views || 0; 
-                appData.donghua[idx] = newItem; 
-            } else { 
-                appData.donghua.push(newItem); 
+            top5.forEach((item, index) => {
+                const latestEp = getLatestEp(item.episodes);
+                const slide = document.createElement('div'); 
+                slide.className = `banner-slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${item.image}');"></div><div class="absolute inset-0 banner-overlay"></div><div class="relative z-10 p-4 pt-20 flex flex-col justify-end h-full pb-8"><div><span class="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded mb-2 inline-block shadow">HOT UPDATE</span><h1 class="text-lg sm:text-2xl font-black text-white leading-tight line-clamp-2 drop-shadow-md mb-2">${item.title}</h1><button onclick="navigateTo('?page=watch&id=${item.id}&ep=${latestEp}')" class="bg-blue-600 text-white text-[10px] font-bold px-4 py-2 rounded-full shadow-lg flex items-center w-fit gap-1 hover:bg-blue-500 transition">▶ TONTON EP ${latestEp}</button></div></div>`;
+                wrapper.appendChild(slide);
+                const dot = document.createElement('button'); 
+                dot.className = `dot w-1.5 h-1.5 rounded-full ${index === 0 ? 'active' : ''}`; 
+                dot.onclick = (e) => { e.stopPropagation(); changeBanner(index); resetBannerInterval(); };
+                dotsContainer.appendChild(dot);
+            });
+            startBannerSlider(top5.length);
+        }
+
+        function changeBanner(index) { const slides = document.querySelectorAll('.banner-slide'); const dots = document.querySelectorAll('.dot'); if (slides.length === 0) return; slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active')); currentBannerIndex = index; if (currentBannerIndex >= slides.length) currentBannerIndex = 0; if (currentBannerIndex < 0) currentBannerIndex = slides.length - 1; slides[currentBannerIndex].classList.add('active'); dots[currentBannerIndex].classList.add('active'); }
+        function startBannerSlider(length) { if (bannerInterval) clearInterval(bannerInterval); if (length <= 1) return; bannerInterval = setInterval(() => { changeBanner(currentBannerIndex + 1); }, 4000); }
+        function resetBannerInterval() { const slides = document.querySelectorAll('.banner-slide'); startBannerSlider(slides.length); }
+
+        function renderSidebars() {
+             const s = [...appData.donghua].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+             ['popular-list-home', 'popular-list-syn', 'popular-list-watch'].forEach(id => {
+                 const el = document.getElementById(id);
+                 if (el) {
+                     el.innerHTML = "";
+                     s.forEach((i, x) => {
+                         el.innerHTML += `<a href="?page=synopsis&id=${i.id}" onclick="event.preventDefault(); openSynopsisAndTrack('${i.id}')" class="flex gap-3 items-center p-2 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700 transition block mb-2"><span class="text-lg font-bold text-gray-500 w-4 text-center italic">${x + 1}</span><img src="${i.image}" alt="${i.title}" class="w-10 h-14 object-cover rounded bg-slate-900"><div class="flex-1 min-w-0"><h4 class="text-white text-xs font-bold truncate">${i.title}</h4><p class="text-[10px] text-gray-400">${i.views || 0} Views</p></div></a>`;
+                     });
+                 }
+             });
+         }
+
+        // SYNOPSIS
+        async function openSynopsisAndTrack(id) { 
+            const idx = appData.donghua.findIndex(d => d.id == id); 
+            if (idx > -1) {
+                appData.donghua[idx].views = (appData.donghua[idx].views || 0) + 1;
+                fetch(`${CONFIG.workerUrl}/api/view`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) }).catch(err => {});
+            }
+            navigateTo(`?page=synopsis&id=${id}`); 
+        }
+
+        function loadSynopsis(id) {
+            const i = appData.donghua.find(d => d.id == id); if (!i) return;
+            document.title = `Nonton ${i.title} Sub Indo`;
+            document.getElementById('syn-title').innerText = i.title; document.getElementById('syn-desc').innerText = i.synopsis; document.getElementById('syn-image').src = i.image; document.getElementById('syn-image').alt = i.title;
+            document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length || 0) + " Eps"; document.getElementById('syn-views').innerText = (i.views || 0) + " Views";
+            const btnContainer = document.getElementById('synopsis-buttons');
+            const isBookmarked = currentUser && (currentUser.bookmarks || []).includes(id);
+            btnContainer.innerHTML = `<button id="btn-bookmark" onclick="toggleBookmark()" class="bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-600 flex-1">${isBookmarked ? '❤️ Tersimpan' : '🤍 Favorit'}</button><button onclick="showShareOptions('${id}', null, '${i.title}')" class="bg-green-600/80 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg border border-green-500/50">🔗 Bagikan</button>`;
+            const startBtn = document.getElementById('btn-start-watch');
+            if (startBtn) { startBtn.onclick = function () { jumpToFirstEp(id); }; }
+            const c = document.getElementById('syn-episodes'); c.innerHTML = "";
+            (i.episodes || []).sort((a, b) => a.ep - b.ep).forEach(e => { c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${e.ep}')" class="ep-btn ep-btn-default">${e.ep}</button>`; });
+            renderSidebars();
+        }
+
+        function jumpToFirstEp(id) { if (!id) { const p = new URLSearchParams(window.location.search); id = p.get('id'); } const item = appData.donghua.find(d => d.id == id); if (item && item.episodes && item.episodes.length > 0) { const sorted = [...item.episodes].sort((a, b) => a.ep - b.ep); navigateTo(`?page=watch&id=${id}&ep=${sorted[0].ep}`); } else { alert("Belum ada episode."); } }
+
+        // WATCH (UPDATED WITH SERVER SUPPORT)
+        function loadWatch(id, epNum) {
+            const i = appData.donghua.find(d => d.id == id), e = i.episodes.find(x => x.ep == epNum); if (!e) return;
+            document.title = `Nonton ${i.title} Episode ${epNum}`;
+            document.getElementById('watch-title').innerText = `${i.title} - Eps ${epNum}`; 
+            document.getElementById('watch-views').innerText = `${i.views || 0} Views`; 
+            document.getElementById('back-link').onclick = (ev) => { ev.preventDefault(); navigateTo(`?page=synopsis&id=${id}`) };
+            
+            const btnContainer = document.getElementById('watch-page-buttons');
+            btnContainer.innerHTML = `<button id="btn-bookmark-watch" onclick="toggleBookmark()" class="text-gray-400 hover:text-pink-500 transition">🤍</button><button onclick="showShareOptions('${id}', '${epNum}', '${i.title}')" class="text-gray-400 hover:text-blue-500 transition text-lg" aria-label="Bagikan">🔗</button>`;
+            updateBookmarkUI(id);
+            
+            // HISTORY
+            if (currentUser) { if (!currentUser.history) currentUser.history = []; const hIdx = currentUser.history.findIndex(h => h.id == id); if (hIdx > -1) currentUser.history.splice(hIdx, 1); currentUser.history.unshift({ id: id, ep: epNum }); if (currentUser.history.length > 50) currentUser.history.pop(); saveUserDB(); localStorage.setItem('user_session', JSON.stringify(currentUser)); }
+            
+            // RENDER EPISODE LIST
+            const c = document.getElementById('watch-ep-list'); c.innerHTML = "";
+            i.episodes.sort((a, b) => a.ep - b.ep).forEach(ep => {
+                const isActive = ep.ep == epNum;
+                const btnClass = isActive ? "ep-btn-active" : "ep-btn-default";
+                c.innerHTML += `<button onclick="navigateTo('?page=watch&id=${id}&ep=${ep.ep}')" class="ep-btn ${btnClass}">${ep.ep}</button>`;
+            });
+
+            // HANDLE SERVERS (Multi-Stream)
+            // Format URL di database bisa berupa URL biasa (string) ATAU Textarea format (ServerName | Link \n ServerName2 | Link2)
+            const streams = parseStreams(e.url);
+            renderServerButtons(streams);
+            if(streams.length > 0) {
+                 document.getElementById('video-player').src = streams[0].url;
             }
 
-            try {
-                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { 
-                    method: "PUT", 
-                    headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, 
-                    body: JSON.stringify({ donghua: appData.donghua }) 
-                });
-                
-                if (r.ok) {
-                    alert("Tersimpan!");
-                    // Trigger Notifikasi jika tidak dijadwalkan (atau jadwal sudah lewat)
-                    if (!scheduledTime || scheduledTime <= Date.now()) {
-                        fetch(`${CONFIG.workerUrl}/api/notify`, { 
-                            method: "POST", 
-                            headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, 
-                            body: JSON.stringify({ 
-                                title: newItem.title, 
-                                image: newItem.image, 
-                                url: `https://ds.xhtml.cfd/?page=synopsis&id=${newItemId}`, // Ganti dengan domain asli Anda
-                                status: isNewEntry ? 'new' : 'update', 
-                                latestEp: getLatestEp(newItem.episodes),
-                                customMessage: customMsg
-                            }) 
-                        }).catch(e => console.log("Notif error", e));
-                    }
-                    clearForm(); 
-                    renderAdminList();
-                } else if (r.status === 401) { 
-                    showReauthPopup(() => saveDonghua()); 
-                } else { 
-                    alert("Gagal menyimpan."); 
+            fetchChatData().then(() => renderChat(id, epNum));
+            renderSidebars();
+        }
+
+        // Helper untuk memecah string textarea menjadi array object stream
+        function parseStreams(urlStr) {
+            // Jika format lama (cuma 1 url, tidak ada karakter pipe '|')
+            if (!urlStr.includes('|')) {
+                return [{ name: "Default", url: urlStr }];
+            }
+            // Format baru: Nama | URL (per baris)
+            const lines = urlStr.split('\n');
+            const streams = [];
+            lines.forEach(line => {
+                const parts = line.split('|');
+                if (parts.length >= 2) {
+                    streams.push({
+                        name: parts[0].trim(),
+                        url: parts.slice(1).join('|').trim() // Gabung lagi sisa jika ada | lain di URL
+                    });
                 }
-            } catch (e) { alert("Error Worker: " + e.message); }
+            });
+            // Fallback jika gagal parse tapi ada konten
+            if (streams.length === 0 && urlStr.trim().length > 0) {
+                 return [{ name: "Default", url: urlStr }];
+            }
+            return streams;
         }
 
-        async function deleteData(id) {
-            const secretPass = sessionStorage.getItem('admin_secret_temp');
-            if (!secretPass) return showReauthPopup(() => deleteData(id));
-            if (!confirm("Yakin hapus? Data hilang permanen.")) return;
+        function renderServerButtons(streams) {
+            const container = document.getElementById('server-list-container');
+            container.innerHTML = "";
             
-            const originalData = [...appData.donghua];
-            appData.donghua = appData.donghua.filter(x => x.id != id);
-            
-            try {
-                const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { 
-                    method: "PUT", 
-                    headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, 
-                    body: JSON.stringify({ donghua: appData.donghua }) 
-                });
-                if (r.ok) { renderAdminList(); }
-                else if (r.status === 401) { appData.donghua = originalData; showReauthPopup(() => deleteData(id)); }
-                else { alert("Gagal menghapus."); appData.donghua = originalData; }
-            } catch (e) { alert("Error Network"); appData.donghua = originalData; }
+            if (streams.length <= 1) {
+                // Jika cuma 1 server, sembunyikan container atau tampilkan teks standar
+                // container.parentElement.style.display = 'none'; 
+                // Atau biarkan kosong
+                return;
+            } else {
+                container.parentElement.style.display = 'block';
+            }
+
+            streams.forEach((s, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `server-btn ${idx === 0 ? 'active' : ''} whitespace-nowrap`;
+                btn.innerText = s.name;
+                btn.onclick = () => {
+                    document.getElementById('video-player').src = s.url;
+                    // Update active class
+                    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+                container.appendChild(btn);
+            });
         }
 
-        function downloadSitemap() { 
-            // Logic sitemap sama
-            alert("Sitemap generated (Dummy function)"); 
+        // CHAT
+        async function sendChat(donghuaId, epNum) { const input = document.getElementById('chat-input'); const msg = input.value.trim(); if (!msg) return; const newChat = { id: Date.now().toString(), donghuaId: donghuaId, ep: epNum, user: currentUserNameDisplay || "User", text: msg, timestamp: Date.now() }; try { const r = await fetch(`${CONFIG.workerUrl}/api/chat`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "add", comment: newChat }) }); const res = await r.json(); if (r.ok && res.status === "Chat Saved") { input.value = ""; chatData.comments.push(newChat); renderChat(donghuaId, epNum); } else { alert(res.error || "Gagal mengirim pesan."); } } catch (e) { alert("Error: " + e.message); } }
+        function renderChat(donghuaId, epNum) { const container = document.getElementById('chat-container'); const inputArea = document.getElementById('chat-input-area'); if (currentUser) { inputArea.innerHTML = `<div class="flex gap-2"><input type="text" id="chat-input" class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs" placeholder="Komentar..."><button onclick="sendChat('${donghuaId}', '${epNum}')" class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-xs">Kirim</button></div>`; } else { inputArea.innerHTML = `<button onclick="navigateTo('?page=auth')" class="w-full bg-slate-800 text-blue-400 py-1.5 rounded text-xs border border-slate-700 dashed">Login untuk Chat</button>`; } const messages = chatData.comments.filter(c => c.donghuaId === donghuaId && c.ep == epNum).sort((a, b) => a.timestamp - b.timestamp); container.innerHTML = ""; if (messages.length === 0) { container.innerHTML = `<div class="text-center text-gray-500 text-xs py-10">Belum ada komentar.</div>`; return; } messages.forEach(msg => { const div = document.createElement('div'); div.className = "chat-bubble"; const userDiv = document.createElement('div'); userDiv.className = "chat-user"; userDiv.innerHTML = `${msg.user} <span class="chat-time">${timeAgo(msg.timestamp)}</span>`; const textDiv = document.createElement('div'); textDiv.className = "chat-text"; textDiv.textContent = msg.text; div.appendChild(userDiv); div.appendChild(textDiv); container.appendChild(div); }); container.scrollTop = container.scrollHeight; }
+        function timeAgo(ts) { const seconds = Math.floor((Date.now() - ts) / 1000); let interval = seconds / 31536000; if (interval > 1) return Math.floor(interval) + " thn"; interval = seconds / 2592000; if (interval > 1) return Math.floor(interval) + " bln"; interval = seconds / 86400; if (interval > 1) return Math.floor(interval) + " hr"; return "Barusan"; }
+
+        // SCHEDULE
+        function switchScheduleTab(day) {
+            activeScheduleDay = day;
+            document.querySelectorAll('.sched-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${day}`).classList.add('active');
+            const container = document.getElementById('schedule-content-grid');
+            container.innerHTML = "";
+            const list = appData.donghua.filter(d => d.day && d.day.includes(day));
+            if (list.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 text-xs">Tidak ada jadwal hari ${day}</div>`; return; }
+            list.forEach(i => {
+                let timeDisplay = "Rutin";
+                if (i.scheduledTime) {
+                    const dateObj = new Date(i.scheduledTime);
+                    timeDisplay = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+                }
+                container.innerHTML += `<div onclick="openSynopsisAndTrack('${i.id}')" class="bg-slate-800 rounded overflow-hidden shadow-lg border border-slate-700 cursor-pointer relative card-shadow active:scale-95 transition"><div class="relative"><img src="${i.image}" alt="${i.title}" class="w-full aspect-[3/4] object-cover"><div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-2 pt-6"><h4 class="text-white text-[11px] font-bold leading-tight line-clamp-2">${i.title}</h4></div><div class="absolute top-1 left-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">TV</div></div><div class="p-2 bg-slate-850 flex justify-center items-center border-t border-slate-700"><div class="flex items-center gap-1 text-gray-300 text-[10px]"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>${timeDisplay}</span></div></div></div>`;
+            });
         }
 
-        async function updateAdminCredentials() {
-            // Copy logic update credentials dari file lama, sesuaikan ID elemennya
-            // ...
-            alert("Fitur update password admin (Salin logic dari file lama jika butuh)");
+        // PROFILE & AUTH
+        function renderProfile() { document.getElementById('profile-name').innerText = currentUserNameDisplay || "Member"; document.getElementById('tab-p-bookmark').className = `tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab === 'bookmark' ? 'active' : 'text-gray-500'}`; document.getElementById('tab-p-history').className = `tab-btn flex-1 pb-3 font-bold text-center text-xs uppercase transition ${currentProfileTab === 'history' ? 'active' : 'text-gray-500'}`; const c = document.getElementById('profile-content-list'); c.innerHTML = ""; let data = []; if (currentProfileTab === 'bookmark') data = (currentUser.bookmarks || []).map(id => appData.donghua.find(d => d.id == id)).filter(Boolean); else data = (currentUser.history || []).map(h => { const d = appData.donghua.find(x => x.id == h.id); return d ? { ...d, lastEp: h.ep } : null }).filter(Boolean); if (data.length === 0) c.innerHTML = `<div class="col-span-full text-center text-gray-500 text-xs py-10">Kosong</div>`; data.forEach(i => { const d = document.createElement('div'); d.className = "relative cursor-pointer active:scale-95 transition"; d.onclick = () => currentProfileTab === 'history' ? navigateTo(`?page=watch&id=${i.id}&ep=${i.lastEp}`) : openSynopsisAndTrack(i.id); d.innerHTML = `<div class="rounded overflow-hidden bg-slate-800"><img src="${i.image}" alt="${i.title}" class="poster-card"><div class="absolute top-1 right-1 ${currentProfileTab === 'history' ? 'bg-green-600' : 'bg-pink-600'} text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">${currentProfileTab === 'history' ? 'EP ' + i.lastEp : '♥'}</div><div class="p-2"><h4 class="text-white text-[10px] font-bold truncate">${i.title}</h4></div></div>`; c.appendChild(d); }); }
+        function switchProfileTab(t) { currentProfileTab = t; renderProfile(); }
+        async function toggleBookmark() { if (!currentUser) return alert("Login dulu"); const p = new URLSearchParams(window.location.search), id = p.get('id'); if (!currentUser.bookmarks) currentUser.bookmarks = []; const idx = currentUser.bookmarks.indexOf(id); if (idx > -1) currentUser.bookmarks.splice(idx, 1); else currentUser.bookmarks.push(id); updateBookmarkUI(id); await saveUserDB(); localStorage.setItem('user_session', JSON.stringify(currentUser)); }
+        function updateBookmarkUI(id) { const isSaved = currentUser && currentUser.bookmarks.includes(id); const btnWatch = document.getElementById('btn-bookmark-watch'); if (btnWatch) { btnWatch.innerHTML = isSaved ? '❤️' : '🤍'; btnWatch.classList.toggle('text-pink-500', isSaved); btnWatch.classList.toggle('text-gray-400', !isSaved); } const btnSyn = document.getElementById('btn-bookmark'); if (btnSyn) { btnSyn.innerHTML = isSaved ? "❤️ Tersimpan" : "🤍 Favorit"; } }
+
+        async function handleLogin() { const u = document.getElementById('login-user').value.trim(); const p = document.getElementById('login-pass').value.trim(); const msg = document.getElementById('auth-msg'); if (!u || !p) { msg.innerText = "Isi User & Pass"; return; } msg.innerText = "Memproses..."; const hashedUser = await hashString(u); const hashedPass = await hashPass(p); try { const r = await fetch(`${CONFIG.workerUrl}/api/users`); const j = await r.json(); const users = j.users || []; let target = users.find(x => x.username === hashedUser && x.password === hashedPass); if (target) { loginSuccess(target, u); } else { msg.innerText = "Gagal Login"; } } catch (e) { msg.innerText = "Error Jaringan"; } }
+        async function handleRegister() { const u = document.getElementById('reg-user').value.trim(); const p = document.getElementById('reg-pass').value.trim(); const msg = document.getElementById('auth-msg'); if (u.length < 3 || p.length < 3) { msg.innerText = "Min 3 karakter"; return; } msg.innerText = "Mendaftarkan..."; const hashedUser = await hashString(u); const hashedPass = await hashPass(p); const newUser = { username: hashedUser, password: hashedPass, bookmarks: [], history: [] }; try { const r = await fetch(`${CONFIG.workerUrl}/api/users`); const j = await r.json(); if (!j.users) j.users = []; if (j.users.find(u => u.username === hashedUser)) { msg.innerText = "Username Ada"; return; } j.users.push(newUser); await fetch(`${CONFIG.workerUrl}/api/users`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(j) }); loginSuccess(newUser, u); } catch (e) { msg.innerText = "Error Jaringan"; } }
+        async function saveUserDB() { if (!currentUser) return; try { const r = await fetch(`${CONFIG.workerUrl}/api/users`); const j = await r.json(); if (!j.users) j.users = []; const idx = j.users.findIndex(u => u.username === currentUser.username); if (idx > -1) { j.users[idx] = currentUser; await fetch(`${CONFIG.workerUrl}/api/users`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(j) }); } } catch (e) { } }
+        async function changeUserPassword() { const oldP = document.getElementById('user-old-pass').value.trim(); const newP = document.getElementById('user-new-pass').value.trim(); if (!oldP || !newP || !currentUser) return alert("Isi lengkap"); const hashedOld = await hashPass(oldP); const hashedNew = await hashPass(newP); if (currentUser.password === hashedOld) { currentUser.password = hashedNew; await saveUserDB(); alert("Sukses!"); } else { alert("Password lama salah"); } }
+        function loginSuccess(user, realName) { const msg = document.getElementById('auth-msg'); msg.innerText = "Berhasil!"; currentUser = user; currentUserNameDisplay = realName; localStorage.setItem('user_session', JSON.stringify(currentUser)); localStorage.setItem('user_name_display', currentUserNameDisplay); setTimeout(() => { navigateTo('?page=profile'); }, 800); }
+        function userLogout() { currentUser = null; currentUserNameDisplay = ""; localStorage.removeItem('user_session'); localStorage.removeItem('user_name_display'); navigateTo('/'); }
+        function switchAuthMode(m) { document.getElementById('form-login').classList.toggle('hide', m !== 'login'); document.getElementById('form-register').classList.toggle('hide', m === 'login'); document.getElementById('auth-msg').innerText = ""; const tabLogin = document.getElementById('tab-login'); const tabReg = document.getElementById('tab-register'); if (m === 'login') { tabLogin.classList.add('border-blue-500', 'text-white'); tabLogin.classList.remove('text-gray-500'); tabReg.classList.remove('border-blue-500', 'text-white'); tabReg.classList.add('text-gray-500'); } else { tabReg.classList.add('border-blue-500', 'text-white'); tabReg.classList.remove('text-gray-500'); tabLogin.classList.remove('border-blue-500', 'text-white'); tabLogin.classList.add('text-gray-500'); } }
+
+        // SEARCH
+        function doSearch(v) { const b = document.getElementById('search-results'); if (!v) { b.classList.add('hide'); return; } const r = appData.donghua.filter(d => d.title.toLowerCase().includes(v.toLowerCase())).slice(0, 5); b.innerHTML = ""; if (r.length === 0) b.innerHTML = "<div class='p-2 text-center text-gray-500 text-xs'>Nihil</div>"; r.forEach(i => { b.innerHTML += `<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="flex gap-2 p-2 border-b border-slate-700 cursor-pointer hover:bg-slate-700"><img src="${i.image}" alt="${i.title}" class="w-8 h-10 object-cover rounded"><div class="text-xs text-white font-bold">${i.title}</div></div>`; }); b.classList.remove('hide'); }
+        document.addEventListener('click', e => { if (!e.target.closest('.relative.max-w-md')) document.getElementById('search-results').classList.add('hide') });
+
+        // SHARE
+        function showShareOptions(id, ep, title) {
+            let backendShareUrl = `${CONFIG.workerUrl}/share?id=${id}`;
+            if (ep) backendShareUrl += `&ep=${ep}`;
+            let text = `Nonton Donghua: <b>${title}</b>`;
+            if (ep) text = `Nonton <b>${title}</b> - Episode ${ep}`;
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(backendShareUrl)}&text=${encodeURIComponent(text)}`;
+            const frontendUrlToCopy = ep ? `${window.location.origin}${window.location.pathname}?page=watch&id=${id}&ep=${ep}` : `${window.location.origin}${window.location.pathname}?page=synopsis&id=${id}`;
+            const copyLink = () => navigator.clipboard.writeText(frontendUrlToCopy).then(() => alert("Link tersalin!")).catch(() => alert("Gagal menyalin link"));
+            const modal = document.createElement('div');
+            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:100;";
+            modal.onclick = () => modal.remove();
+            modal.innerHTML = `<div style="background:#1e293b; padding:20px; border-radius:12px; border:1px solid #334155; text-align:center;" onclick="event.stopPropagation()"><h3 style="font-weight:bold; color:white; margin-bottom:15px;">Bagikan</h3><div style="display:flex; gap:10px;"><button id="copy-btn" style="background:#3b82f6; color:white; padding:8px 16px; border-radius:8px; font-size:12px;">Salin Link</button><a href="${telegramUrl}" target="_blank" rel="noopener noreferrer" style="background:#229ED9; color:white; padding:8px 16px; border-radius:8px; font-size:12px; text-decoration:none;">Telegram</a></div></div>`;
+            document.body.appendChild(modal);
+            document.getElementById('copy-btn').onclick = (e) => { e.stopPropagation(); copyLink(); modal.remove(); };
         }
     </script>
 </body>
