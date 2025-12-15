@@ -57,7 +57,7 @@ export async function onRequest(context) {
 
     const page = url.searchParams.get('page');
     const donghuaId = url.searchParams.get('id');
-    const episodeNumber = url.search_params.get('ep');
+    const episodeNumber = url.searchParams.get('ep');
 
     if ((page !== 'synopsis' && page !== 'watch') || !donghuaId) {
       console.log('[Middleware] Bukan halaman sinopsis/watch, dilewati.');
