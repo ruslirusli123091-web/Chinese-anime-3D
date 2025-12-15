@@ -1,43 +1,45 @@
 // File: functions/_middleware.js
-// VERSI FINAL YANG SEHARUSNYA BERJALAN DENGAN BAIK
+// VERSI FINAL DENGAN PERBAIKAN BERDASARKAN LOG ERROR
 
-class MetaTagInjector {
-    constructor(metaData) {
-        this.meta = metaData;
-    }
-
-    element(element) {
-        if (!this.meta) return;
-
-        const title = (this.meta.title || '').replace(/"/g, '&quot;');
-        const description = (this.meta.description || '').substring(0, 160).replace(/"/g, '&quot;');
-        const imageUrl = this.meta.imageUrl || '';
-        const pageUrl = this.meta.url || '';
-        const ogType = this.meta.ogType || 'website';
-
-        if (element.tagName === 'title') {
-            element.setInnerContent(title, { html: false });
-        }
-
-        if (element.tagName === 'head') {
-            element.querySelector('meta[name="description"]')?.remove();
-            element.querySelector('meta[property="og:title"]')?.remove();
-            element.querySelector('meta[property="og:description"]')?.remove();
-            element.querySelector('meta[property="og:url"]')?.remove();
-            element.querySelector('meta[property="og:image"]')?.remove();
-            element.querySelector('meta[property="og:type"]')?.remove();
-            element.querySelector('meta[name="twitter:card"]')?.remove();
-
-            element.append(`<meta name="description" content="${description}" />`, { html: true });
-            element.append(`<meta property="og:url" content="${pageUrl}" />`, { html: true });
-            element.append(`<meta property="og:title" content="${title}" />`, { html: true });
-            element.append(`<meta property="og:description" content="${description}" />`, { html: true });
-            element.append(`<meta property="og:image" content="${imageUrl}" />`, { html: true });
-            element.append(`<meta property="og:type" content="${ogType}" />`, { html: true });
-            element.append(`<meta name="twitter:card" content="summary_large_image" />`, { html: true });
-        }
-    }
+// Handler sederhana untuk menghapus elemen
+class RemoveHandler {
+  element(element) {
+    element.remove();
+  }
 }
+
+// Handler untuk mengubah isi <title>
+class TitleHandler {
+  constructor(title) {
+    this.title = title;
+  }
+  element(element) {
+    element.setInnerContent(this.title);
+  }
+}
+
+// Handler untuk menambahkan semua meta tag baru ke <head>
+class HeadHandler {
+  constructor(metaData) {
+    this.meta = metaData;
+  }
+  element(element) {
+    const description = (this.meta.description || '').substring(0, 160).replace(/"/g, '&quot;');
+    const imageUrl = this.meta.imageUrl || '';
+    const pageUrl = this.meta.url || '';
+    const ogType = this.meta.ogType || 'video.episode';
+    const title = (this.meta.title || '').replace(/"/g, '&quot;');
+
+    element.append(`<meta name="description" content="${description}" />`, { html: true });
+    element.append(`<meta property="og:url" content="${pageUrl}" />`, { html: true });
+    element.append(`<meta property="og:title" content="${title}" />`, { html: true });
+    element.append(`<meta property="og:description" content="${description}" />`, { html: true });
+    element.append(`<meta property="og:image" content="${imageUrl}" />`, { html: true });
+    element.append(`<meta property="og:type" content="${ogType}" />`, { html: true });
+    element.append(`<meta name="twitter:card" content="summary_large_image" />`, { html: true });
+  }
+}
+
 
 export async function onRequest(context) {
   try {
@@ -45,41 +47,28 @@ export async function onRequest(context) {
     const url = new URL(request.url);
 
     const isAsset = /\.(css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/.test(url.pathname);
-    if (isAsset) {
-      return context.next();
-    }
+    if (isAsset) return context.next();
 
     const page = url.searchParams.get('page');
     const donghuaId = url.searchParams.get('id');
-    const episodeNumber = url.searchParams.get('ep'); // Typo sudah diperbaiki di sini
+    const episodeNumber = url.searchParams.get('ep');
 
     if ((page !== 'synopsis' && page !== 'watch') || !donghuaId) {
       return context.next();
     }
     
-    console.log(`[Middleware] Memproses halaman ${page} untuk ID: ${donghuaId}`);
-    
     const apiUrl = 'https://backup3d.ruslirusli123091.workers.dev/api/donghua';
     const apiResponse = await fetch(apiUrl);
 
-    if (!apiResponse.ok) {
-      throw new Error(`API fetch gagal! Status: ${apiResponse.status}`);
-    }
+    if (!apiResponse.ok) throw new Error(`API fetch gagal! Status: ${apiResponse.status}`);
     
     const apiData = await apiResponse.json();
-    if (!apiData || !Array.isArray(apiData.donghua)) {
-      throw new Error("Struktur data API tidak valid.");
-    }
+    if (!apiData || !Array.isArray(apiData.donghua)) throw new Error("Struktur data API tidak valid.");
     
     const donghua = apiData.donghua.find(d => d && String(d.id) === String(donghuaId));
 
-    if (!donghua) {
-        console.log(`[Middleware] Donghua dengan ID ${donghuaId} tidak ditemukan.`);
-        return context.next();
-    }
+    if (!donghua) return context.next();
 
-    console.log(`[Middleware] Donghua ditemukan: ${donghua.title}`);
-    
     let metaData = null;
     if (page === 'synopsis') {
       metaData = { title: `${donghua.title} - Nonton Donghua Sub Indo`, description: donghua.synopsis || `Nonton streaming ${donghua.title} subtitle Indonesia.`, imageUrl: donghua.image || '', url: url.href, ogType: 'video.tv_show', };
@@ -88,18 +77,33 @@ export async function onRequest(context) {
     }
 
     if (metaData) {
-      console.log('[Middleware] Memproses HTML dengan HTMLRewriter...');
       const response = await context.next();
+      
+      const remover = new RemoveHandler();
+
       return new HTMLRewriter()
-        .on('title', new MetaTagInjector(metaData))
-        .on('head', new MetaTagInjector(metaData))
+        // 1. Hapus semua tag meta default yang relevan
+        .on('meta[name="description"]', remover)
+        .on('meta[property="og:title"]', remover)
+        .on('meta[property="og:description"]', remover)
+        .on('meta[property="og:url"]', remover)
+        .on('meta[property="og:image"]', remover)
+        .on('meta[property="og:type"]', remover)
+        .on('meta[name="twitter:card"]', remover)
+        
+        // 2. Ubah isi <title>
+        .on('title', new TitleHandler(metaData.title))
+        
+        // 3. Tambahkan semua tag meta baru ke <head>
+        .on('head', new HeadHandler(metaData))
+
         .transform(response);
     }
 
     return context.next();
 
   } catch (error) {
-    console.error("[Middleware] FATAL EXCEPTION TERJADI:", error.message);
+    console.error("[Middleware] FATAL ERROR:", error.message);
     return context.next();
   }
 }
