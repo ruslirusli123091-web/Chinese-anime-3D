@@ -1,5 +1,5 @@
 // File: functions/_middleware.js
-// VERSI FINAL DENGAN PENANGANAN ERROR MENYELURUH
+// VERSI FINAL DENGAN TYPO DIPERBAIKI
 
 class MetaTagInjector {
     constructor(metaData) {
@@ -20,7 +20,6 @@ class MetaTagInjector {
         }
 
         if (element.tagName === 'head') {
-            // Hapus tag lama yang mungkin ada dari index.html
             element.querySelector('meta[name="description"]')?.remove();
             element.querySelector('meta[property="og:title"]')?.remove();
             element.querySelector('meta[property="og:description"]')?.remove();
@@ -29,7 +28,6 @@ class MetaTagInjector {
             element.querySelector('meta[property="og:type"]')?.remove();
             element.querySelector('meta[name="twitter:card"]')?.remove();
 
-            // Tambahkan tag baru yang dinamis
             element.append(`<meta name="description" content="${description}" />`, { html: true });
             element.append(`<meta property="og:url" content="${pageUrl}" />`, { html: true });
             element.append(`<meta property="og:title" content="${title}" />`, { html: true });
@@ -42,32 +40,27 @@ class MetaTagInjector {
 }
 
 export async function onRequest(context) {
-  // BUNGKUS SEMUA LOGIKA DALAM SATU TRY...CATCH BESAR
   try {
     const { request } = context;
     const url = new URL(request.url);
 
-    console.log(`[Middleware] Menerima request untuk: ${url.pathname}${url.search}`);
-
     const isAsset = /\.(css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/.test(url.pathname);
     if (isAsset) {
-      console.log('[Middleware] Request adalah aset, dilewati.');
       return context.next();
     }
 
     const page = url.searchParams.get('page');
     const donghuaId = url.searchParams.get('id');
+    // INI DIA PERBAIKANNYA
     const episodeNumber = url.searchParams.get('ep');
 
     if ((page !== 'synopsis' && page !== 'watch') || !donghuaId) {
-      console.log('[Middleware] Bukan halaman sinopsis/watch, dilewati.');
       return context.next();
     }
     
     console.log(`[Middleware] Memproses halaman ${page} untuk ID: ${donghuaId}`);
     
     const apiUrl = 'https://backup3d.ruslirusli123091.workers.dev/api/donghua';
-    console.log(`[Middleware] Mengambil data dari: ${apiUrl}`);
     const apiResponse = await fetch(apiUrl);
 
     if (!apiResponse.ok) {
@@ -79,12 +72,11 @@ export async function onRequest(context) {
       throw new Error("Struktur data API tidak valid.");
     }
     
-    console.log(`[Middleware] Data API berhasil diambil. Mencari ID: ${donghuaId}`);
     const donghua = apiData.donghua.find(d => d && String(d.id) === String(donghuaId));
 
     if (!donghua) {
         console.log(`[Middleware] Donghua dengan ID ${donghuaId} tidak ditemukan.`);
-        return context.next(); // Keluar dengan aman jika tidak ditemukan
+        return context.next();
     }
 
     console.log(`[Middleware] Donghua ditemukan: ${donghua.title}`);
@@ -108,8 +100,7 @@ export async function onRequest(context) {
     return context.next();
 
   } catch (error) {
-    // JIKA TERJADI ERROR DI MANA PUN, CATAT DI LOG DAN KELUAR DENGAN AMAN
     console.error("[Middleware] FATAL EXCEPTION TERJADI:", error);
-    return context.next(); // Ini akan mencegah status "Exception"
+    return context.next();
   }
 }
