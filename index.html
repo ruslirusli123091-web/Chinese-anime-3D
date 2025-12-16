@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo</title>
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia. Update setiap hari, gratis.">
     <meta name="theme-color" content="#0f172a">
@@ -10,8 +10,8 @@
    <meta property="og:title" content="Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo" />
     <meta property="og:description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://ca3d.site/" /> <!-- PASTIKAN INI URL HOMEPAGE ANDA -->
-    <meta property="og:image" content="https://ca3d.site/logo.png" /> <!-- GANTI DENGAN URL LOGO ANDA -->
+    <meta property="og:url" content="https://ca3d.site/" /> 
+    <meta property="og:image" content="https://ca3d.site/logo.png" /> 
     <meta name="twitter:card" content="summary_large_image" />
     
     <!-- PRECONNECT -->
@@ -36,15 +36,16 @@
         body { background-color: #0f172a; color: #cbd5e1; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         
-        /* OPTIMASI GAMBAR (CLS FIX) */
+        /* OPTIMASI GAMBAR */
         .poster-wrapper { position: relative; width: 100%; aspect-ratio: 2/3; background-color: #1e293b; overflow: hidden; }
         .poster-card { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; opacity: 0; transition: opacity 0.3s ease-in; }
         .poster-card.loaded { opacity: 1; }
         
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        /* SCROLLBAR CUSTOM */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         
         /* UI ELEMENTS */
         .sched-btn.active { background-color: #0ea5e9; color: white; border-color: #0284c7; }
@@ -54,15 +55,56 @@
         .loader { border: 4px solid #1e293b; border-radius: 50%; border-top: 4px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* GRIDS & LAYOUT */
-        .ep-grid-custom { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 2px; }
-        @media (min-width: 1024px) { .ep-grid-synopsis { grid-template-columns: repeat(20, 1fr) !important; gap: 4px !important; } .ep-grid-watch { grid-template-columns: repeat(5, 1fr) !important; } }
+        /* --- PENGATURAN GRID KOLOM EPISODE --- */
         
-        /* BUTTONS */
-        .ep-btn { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; min-width: 40px; min-height: 40px; }
+        .ep-grid-custom { 
+            display: grid; 
+            gap: 5px; /* Jarak antar tombol sedikit dirapatkan untuk HP */
+            padding: 2px; 
+        }
+
+        /* LOGIKA TAMPILAN MOBILE (HP) */
+        .ep-grid-synopsis {
+            /* Page Synopsis HP: 6 Kolom */
+            grid-template-columns: repeat(6, 1fr);
+        }
+        
+        .ep-grid-watch {
+            /* Page Nonton HP: 7 Kolom (Sesuai Request) */
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        /* LOGIKA TAMPILAN DESKTOP (PC) */
+        @media (min-width: 1024px) { 
+            .ep-grid-synopsis { 
+                /* Page Synopsis PC: 20 Kolom */
+                grid-template-columns: repeat(20, 1fr) !important; 
+                gap: 4px !important; 
+            } 
+            .ep-grid-watch { 
+                /* Page Nonton PC (Sidebar): 4 Kolom */
+                grid-template-columns: repeat(4, 1fr) !important; 
+                gap: 8px !important;
+                padding-right: 8px; 
+            } 
+        }
+        
+        /* STYLE TOMBOL EPISODE */
+        .ep-btn { 
+            aspect-ratio: 1/1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            font-size: 0.7rem; /* Font agak kecil biar muat 7 kolom */
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            min-width: 0; 
+        }
         .ep-btn-default { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; }
         .ep-btn-default:hover { background-color: #334155; color: white; border-color: #475569; }
-        .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); transform: scale(1.05); }
+        .ep-btn-active { background-color: #2563eb; color: white; border: 1px solid #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6); }
         
         .server-btn { font-size: 11px; padding: 6px 12px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #cbd5e1; cursor: pointer; transition: all 0.2s; min-height: 36px; }
         .server-btn.active { background: #3b82f6; color: white; border-color: #2563eb; }
@@ -79,6 +121,55 @@
         .chat-user { font-weight: bold; color: #60a5fa; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; }
         .chat-time { color: #64748b; font-weight: normal; font-size: 0.6rem; }
         .chat-text { color: #e2e8f0; background: #1e293b; padding: 6px 10px; border-radius: 4px; display: inline-block; margin-top: 2px; max-width: 100%; word-wrap: break-word; line-height: 1.4; }
+
+        /* --- FITUR KHUSUS ROTASI LAYAR --- */
+        .forced-landscape-mode {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 100dvh !important;
+            height: 100vw !important;
+            z-index: 99999 !important;
+            background: #000 !important;
+            transform: translate(-50%, -50%) rotate(90deg) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .forced-landscape-mode iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+        }
+
+        .rotate-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 100000;
+        }
+        
+        .rotate-btn.active-overlay {
+            position: fixed !important;
+            top: 20px;
+            left: 20px;
+            background: rgba(220, 38, 38, 0.8) !important;
+            border-color: #ef4444;
+            transform: rotate(90deg);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            padding: 8px 16px;
+        }
+        .rotate-btn.active-overlay:active { transform: rotate(90deg) scale(0.95); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans text-sm pb-20 select-none bg-slate-900"> 
@@ -123,7 +214,7 @@
             <div id="schedule-content-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
         </div>
 
-        <!-- AUTH PAGE (WITH PASSWORD TOGGLE) -->
+        <!-- AUTH PAGE -->
         <div id="view-auth" class="hide flex justify-center items-center min-h-[50vh]">
             <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
                 <div class="flex mb-6 border-b border-slate-700" role="tablist">
@@ -131,30 +222,22 @@
                     <button onclick="switchAuthMode('register')" id="tab-register" class="flex-1 py-3 text-center font-bold text-gray-400" role="tab" aria-selected="false">Daftar</button>
                 </div>
                 
-                <!-- LOGIN FORM -->
                 <form id="form-login" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                     <label for="login-user" class="sr-only">Username</label>
                     <input type="text" id="login-user" placeholder="Username" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
-                    
-                    <!-- PASSWORD FIELD WITH TOGGLE -->
                     <div class="relative">
                         <label for="login-pass" class="sr-only">Password</label>
                         <input type="password" id="login-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
                         <button type="button" onclick="togglePass('login-pass', this)" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Lihat Password">
-                            <!-- Eye Icon -->
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
                     </div>
-
                     <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-blue-500 min-h-[44px]">Masuk</button>
                 </form>
                 
-                <!-- REGISTER FORM -->
                 <form id="form-register" onsubmit="event.preventDefault(); handleRegister();" class="space-y-4 hide">
                     <label for="reg-user" class="sr-only">Username Baru</label>
                     <input type="text" id="reg-user" placeholder="Username Baru" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm">
-                    
-                    <!-- PASSWORD FIELD WITH TOGGLE -->
                     <div class="relative">
                         <label for="reg-pass" class="sr-only">Password</label>
                         <input type="password" id="reg-pass" placeholder="Password" class="w-full p-3 bg-slate-900 rounded-lg text-white border border-slate-600 text-sm pr-10">
@@ -162,16 +245,14 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
                     </div>
-
                     <button type="submit" class="w-full bg-cyan-600 py-3 rounded-lg font-bold text-white shadow-lg text-sm hover:bg-cyan-500 min-h-[44px]">Buat Akun</button>
                 </form>
-
                 <p id="auth-msg" class="text-center text-xs mt-4 h-4 text-yellow-400 font-bold" aria-live="polite"></p>
                 <p class="text-center text-[10px] text-gray-400 mt-2 italic">Data Tersimpan Aman di Server.</p>
             </div>
         </div>
 
-        <!-- PROFILE PAGE (WITH PASSWORD TOGGLE) -->
+        <!-- PROFILE PAGE -->
         <div id="view-profile" class="hide">
             <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 mb-6 flex items-center justify-between shadow-lg">
                 <div class="flex items-center gap-3">
@@ -195,7 +276,6 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
                     </div>
-                    
                     <label for="user-new-pass" class="sr-only">Password Baru</label>
                     <div class="relative">
                         <input type="password" id="user-new-pass" placeholder="Pass Baru" class="w-full bg-slate-900 border border-slate-600 p-3 rounded text-sm text-white pr-10">
@@ -203,7 +283,6 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         </button>
                     </div>
-                    
                     <button onclick="changeUserPassword()" class="bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded text-sm font-bold min-h-[44px]">Simpan</button>
                 </div>
             </div>
@@ -238,11 +317,12 @@
             </div>
         </div>
 
-        <!-- WATCH PAGE -->
+        <!-- WATCH PAGE (SIDEBAR RAPI 4 KOLOM) -->
         <div id="view-watch" class="hide">
             <div class="lg:flex lg:gap-6">
                 <div class="lg:w-[75%]">
-                    <div class="aspect-video w-full relative bg-black shadow-lg">
+                    <!-- Container Video -->
+                    <div class="aspect-video w-full relative bg-black shadow-lg" id="video-container">
                         <iframe 
                             id="video-player" 
                             src="" 
@@ -251,13 +331,23 @@
                             allowfullscreen="true" 
                             webkitallowfullscreen="true" 
                             mozallowfullscreen="true"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; screen-wake-lock"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             title="Video Player">
                         </iframe>
                     </div>
+                    
                     <div class="bg-slate-900 border-x border-b border-slate-800 p-2">
-                        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="server-list-container"></div>
+                        <!-- SERVER LIST & ROTATE BUTTON -->
+                        <div class="flex justify-between items-center mb-1 gap-2">
+                             <div class="flex items-center gap-2 overflow-x-auto pb-1 flex-1 no-scrollbar" id="server-list-container"></div>
+                             
+                             <button id="btn-rotate-toggle" onclick="toggleLandscape()" class="rotate-btn flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                <span id="text-rotate-btn">Putar Layar</span>
+                             </button>
+                        </div>
                     </div>
+
                     <div class="bg-slate-900 border-b border-slate-800 pb-3 mb-3">
                         <div class="flex justify-between items-start mt-3 mb-2 px-1">
                             <h2 id="watch-title" class="text-sm font-bold text-white flex-1 mr-2 leading-tight">Title</h2>
@@ -274,10 +364,17 @@
                         <div id="chat-input-area"></div>
                     </div>
                 </div>
+                
+                <!-- BAGIAN SIDEBAR EPISODE (DIRAPIKAN & ADA BORDER) -->
                 <div class="lg:w-[25%] lg:h-full">
-                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl">
-                        <h3 class="font-bold text-white text-xs mb-2">Pilih Episode</h3>
-                        <div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto pb-2"></div>
+                    <div class="mb-6 lg:bg-slate-800/50 lg:p-4 lg:rounded-xl lg:border lg:border-slate-700/50">
+                        <h3 class="font-bold text-white text-xs mb-3 border-b border-slate-700 pb-2">PILIH EPISODE</h3>
+                        
+                        <!-- Wrapper dengan batas yang jelas -->
+                        <div class="bg-slate-900/50 rounded-lg p-2 border border-slate-700/30">
+                            <!-- Class khusus .ep-grid-watch untuk desktop -->
+                            <div id="watch-ep-list" class="ep-grid-custom ep-grid-watch max-h-60 lg:max-h-[500px] overflow-y-auto"></div>
+                        </div>
                     </div>
                     <div>
                         <h3 class="font-bold text-white mb-3 text-sm border-l-4 border-red-500 pl-2">Lanjut Nonton 🔥</h3>
@@ -327,10 +424,8 @@
             const isPass = input.type === 'password';
             input.type = isPass ? 'text' : 'password';
             if (isPass) {
-                 // Ganti jadi icon Eye Slash (Tutup mata)
                  btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>`;
             } else {
-                 // Ganti jadi icon Eye (Buka mata)
                  btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
             }
         }
@@ -362,11 +457,23 @@
             const p = new URLSearchParams(window.location.search), page = p.get('page'), id = p.get('id'), ep = p.get('ep');
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hide'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Reset rotate when leaving page
+            resetLandscapeMode();
+
+            // STOP VIDEO SAAT PINDAH HALAMAN
+            const videoFrame = document.getElementById('video-player');
+            if (page !== 'watch' && videoFrame) {
+                videoFrame.src = ""; // Matikan Video
+            }
+
             if(bannerInterval) clearInterval(bannerInterval);
             if(page === 'auth') { if(currentUser){ navigateTo('?page=profile');return; } document.getElementById('view-auth').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); switchAuthMode('login'); }
             else if(page === 'profile') { if(!currentUser){ navigateTo('?page=auth');return; } document.getElementById('view-profile').classList.remove('hide'); document.getElementById('nav-account').classList.add('active'); renderProfile(); }
             else if(page === 'schedule') { document.getElementById('view-schedule').classList.remove('hide'); document.getElementById('nav-schedule').classList.add('active'); switchScheduleTab(activeScheduleDay); }
-            else if(page === 'synopsis' && id) { document.getElementById('view-synopsis').classList.remove('hide'); loadSynopsis(id); }
+            else if(page === 'synopsis' && id) { 
+                document.getElementById('view-synopsis').classList.remove('hide'); 
+                loadSynopsis(id); 
+            }
             else if(page === 'watch' && id && ep) { document.getElementById('view-watch').classList.remove('hide'); loadWatch(id, ep); }
             else { document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active'); renderHome(); }
             window.scrollTo(0, 0);
@@ -519,7 +626,6 @@
             currentBannerIndex = 0; wrapper.innerHTML = ""; dots.innerHTML = "";
             sorted.slice(0, 5).forEach((item, index) => {
                 const latestEp = getLatestEp(item.episodes);
-                const fetchPrio = index === 0 ? 'fetchpriority="high"' : 'loading="lazy"';
                 wrapper.innerHTML += `
                 <div class="banner-slide ${index===0?'active':''}">
                     <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${item.image}');"></div>
@@ -551,7 +657,12 @@
             const idx = appData.donghua.findIndex(d => d.id == id); if(idx>-1){ appData.donghua[idx].views=(appData.donghua[idx].views||0)+1; fetch(`${CONFIG.workerUrl}/api/view`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}).catch(()=>{}); } navigateTo(`?page=synopsis&id=${id}`); 
         }
         function loadSynopsis(id) {
-            const i = appData.donghua.find(d => d.id == id); if(!i) return;
+            // Gunakan loose equality (==) karena ID bisa berupa string atau number
+            const i = appData.donghua.find(d => d.id == id); 
+            if(!i) {
+                // Jika data tidak ditemukan (misal karena belum load atau ID salah), coba fetch ulang atau kembali
+                return; 
+            }
             document.getElementById('syn-title').innerText = i.title; document.getElementById('syn-desc').innerText = i.synopsis; 
             const img = document.getElementById('syn-image'); img.src = i.image; img.alt = "Poster " + i.title; img.onload=function(){this.classList.add('loaded')};
             document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length||0)+" Eps"; document.getElementById('syn-views').innerText = (i.views||0)+" Views";
@@ -581,10 +692,39 @@
             const streams = parseStreams(e.url); renderServerButtons(streams);
             if(streams.length>0) document.getElementById('video-player').src = streams[0].url;
             fetchChatData().then(() => renderChat(id, epNum)); renderSidebars();
+            
+            // RESET ROTATE SAAT GANTI EP
+            resetLandscapeMode();
         }
 
         function parseStreams(u) { if(!u.includes('|')) return [{name:"Default", url:u}]; return u.split('\n').map(l=>{const p=l.split('|'); return p.length>=2?{name:p[0].trim(),url:p.slice(1).join('|').trim()}:null}).filter(Boolean); }
-        function renderServerButtons(s) { const c=document.getElementById('server-list-container'); c.innerHTML=""; if(s.length<=1)return c.parentElement.style.display='none'; c.parentElement.style.display='block'; s.forEach((v,k)=>{ const b=document.createElement('button'); b.className=`server-btn ${k===0?'active':''} whitespace-nowrap`; b.innerText=v.name; b.onclick=()=>{document.getElementById('video-player').src=v.url;document.querySelectorAll('.server-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active')}; c.appendChild(b); }); }
+        
+        // --- FIX TOMBOL PUTAR LAYAR HILANG JIKA SERVER CUMA 1 ---
+        function renderServerButtons(s) { 
+            const c = document.getElementById('server-list-container'); 
+            c.innerHTML = ""; 
+            
+            // PASTIKAN PARENT SELALU MUNCUL AGAR TOMBOL ROTATE KELIHATAN
+            c.parentElement.style.display = 'flex'; 
+
+            if(s.length <= 1) {
+                // Jika server cuma 1, biarkan kosong (tapi parent tetap visible)
+                return; 
+            }
+
+            // Render tombol server jika lebih dari 1
+            s.forEach((v,k)=>{ 
+                const b = document.createElement('button'); 
+                b.className = `server-btn ${k===0?'active':''} whitespace-nowrap`; 
+                b.innerText = v.name; 
+                b.onclick = () => {
+                    document.getElementById('video-player').src = v.url;
+                    document.querySelectorAll('.server-btn').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                }; 
+                c.appendChild(b); 
+            }); 
+        }
 
         async function sendChat(dId, ep) { const inp=document.getElementById('chat-input'), txt=inp.value.trim(); if(!txt)return; const newChat={id:Date.now().toString(), donghuaId:dId, ep, user:currentUser?currentUser.display_name:"User", text:txt, timestamp:Date.now()}; try { const r=await fetch(`${CONFIG.workerUrl}/api/chat`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",comment:newChat})}); const j=await r.json(); if(r.ok && j.status==="Chat Saved"){ inp.value=""; chatData.comments.push(newChat); renderChat(dId, ep); } else alert(j.error||"Gagal"); } catch(e){alert("Error:"+e.message);} }
         function renderChat(dId, ep) { const c=document.getElementById('chat-container'), a=document.getElementById('chat-input-area'); if(currentUser) a.innerHTML=`<div class="flex gap-2"><label for="chat-input" class="sr-only">Komentar</label><input type="text" id="chat-input" class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-xs" placeholder="Komentar..."><button onclick="sendChat('${dId}','${ep}')" class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-xs min-h-[36px]">Kirim</button></div>`; else a.innerHTML=`<button onclick="navigateTo('?page=auth')" class="w-full bg-slate-800 text-blue-400 py-2 rounded text-xs border border-slate-700 dashed">Login untuk Chat</button>`; const msgs=chatData.comments.filter(x=>x.donghuaId===dId && x.ep==ep).sort((a,b)=>a.timestamp-b.timestamp); c.innerHTML=""; if(msgs.length===0) c.innerHTML=`<div class="text-center text-gray-500 text-xs py-10">Belum ada komentar.</div>`; msgs.forEach(m=>{ c.innerHTML+=`<div class="chat-bubble"><div class="chat-user">${m.user} <span class="chat-time">${timeAgo(m.timestamp)}</span></div><div class="chat-text">${m.text}</div></div>`; }); c.scrollTop=c.scrollHeight; }
@@ -599,6 +739,34 @@
         function doSearch(v) { const b=document.getElementById('search-results'); if(!v){b.classList.add('hide');return;} const r=appData.donghua.filter(d=>d.title.toLowerCase().includes(v.toLowerCase())).slice(0,5); b.innerHTML=""; if(r.length===0)b.innerHTML="<div class='p-2 text-center text-gray-500 text-xs'>Nihil</div>"; r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="flex gap-2 p-2 border-b border-slate-700 cursor-pointer hover:bg-slate-700"><img src="${i.image}" alt="${i.title}" width="32" height="40" class="w-8 h-10 object-cover rounded"><div class="text-xs text-white font-bold">${i.title}</div></div>`}); b.classList.remove('hide'); }
         document.addEventListener('click', e=>{if(!e.target.closest('.relative.max-w-md'))document.getElementById('search-results').classList.add('hide')});
         function showShare(id,ep,title){ const url=`${CONFIG.workerUrl}/share?id=${id}${ep?'&ep='+ep:''}`, txt=ep?`Nonton ${title} Episode ${ep}`:`Nonton ${title}`; navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?page=${ep?'watch':'synopsis'}&id=${id}${ep?'&ep='+ep:''}`).then(()=>alert("Link tersalin")).catch(()=>{}); window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(txt)}`,'_blank'); }
+    
+        // --- FITUR ROTASI MANUAL ---
+        function toggleLandscape() {
+            const container = document.getElementById('video-container');
+            const btn = document.getElementById('btn-rotate-toggle');
+            const txt = document.getElementById('text-rotate-btn');
+            
+            if (container.classList.contains('forced-landscape-mode')) {
+                // Matikan Landscape
+                resetLandscapeMode();
+            } else {
+                // Aktifkan Landscape
+                container.classList.add('forced-landscape-mode');
+                btn.classList.add('active-overlay');
+                txt.innerText = "KELUAR";
+                btn.innerHTML = `<span class="text-lg font-bold">✖</span> KELUAR`;
+            }
+        }
+
+        function resetLandscapeMode() {
+            const container = document.getElementById('video-container');
+            const btn = document.getElementById('btn-rotate-toggle');
+            if(container) container.classList.remove('forced-landscape-mode');
+            if(btn) {
+                btn.classList.remove('active-overlay');
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg> <span id="text-rotate-btn">Putar Layar</span>`;
+            }
+        }
     </script>
 </body>
 </html>
