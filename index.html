@@ -243,6 +243,7 @@
             <div class="lg:flex lg:gap-6">
                 <div class="lg:w-[75%]">
                     <div class="aspect-video w-full relative bg-black shadow-lg">
+                        <!-- IFRAME YANG DIPERBAIKI UNTUK ROTASI OTOMATIS -->
                         <iframe 
                             id="video-player" 
                             src="" 
@@ -599,6 +600,25 @@
         function doSearch(v) { const b=document.getElementById('search-results'); if(!v){b.classList.add('hide');return;} const r=appData.donghua.filter(d=>d.title.toLowerCase().includes(v.toLowerCase())).slice(0,5); b.innerHTML=""; if(r.length===0)b.innerHTML="<div class='p-2 text-center text-gray-500 text-xs'>Nihil</div>"; r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="flex gap-2 p-2 border-b border-slate-700 cursor-pointer hover:bg-slate-700"><img src="${i.image}" alt="${i.title}" width="32" height="40" class="w-8 h-10 object-cover rounded"><div class="text-xs text-white font-bold">${i.title}</div></div>`}); b.classList.remove('hide'); }
         document.addEventListener('click', e=>{if(!e.target.closest('.relative.max-w-md'))document.getElementById('search-results').classList.add('hide')});
         function showShare(id,ep,title){ const url=`${CONFIG.workerUrl}/share?id=${id}${ep?'&ep='+ep:''}`, txt=ep?`Nonton ${title} Episode ${ep}`:`Nonton ${title}`; navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?page=${ep?'watch':'synopsis'}&id=${id}${ep?'&ep='+ep:''}`).then(()=>alert("Link tersalin")).catch(()=>{}); window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(txt)}`,'_blank'); }
+    
+        // FIX ROTASI VIDEO FULLSCREEN
+        document.addEventListener("fullscreenchange", handleRot);
+        document.addEventListener("webkitfullscreenchange", handleRot);
+        document.addEventListener("mozfullscreenchange", handleRot);
+        document.addEventListener("MSFullscreenChange", handleRot);
+
+        function handleRot() {
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            if (isFull) {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock("landscape").catch(e => console.log("Rotasi diblokir browser: ", e));
+                }
+            } else {
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                }
+            }
+        }
     </script>
 </body>
 </html>
