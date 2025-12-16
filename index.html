@@ -243,7 +243,17 @@
             <div class="lg:flex lg:gap-6">
                 <div class="lg:w-[75%]">
                     <div class="aspect-video w-full relative bg-black shadow-lg">
-                        <iframe id="video-player" src="" class="w-full h-full" frameborder="0" allowfullscreen title="Video Player"></iframe>
+                        <iframe 
+                            id="video-player" 
+                            src="" 
+                            class="w-full h-full" 
+                            frameborder="0" 
+                            allowfullscreen="true" 
+                            webkitallowfullscreen="true" 
+                            mozallowfullscreen="true"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; screen-wake-lock"
+                            title="Video Player">
+                        </iframe>
                     </div>
                     <div class="bg-slate-900 border-x border-b border-slate-800 p-2">
                         <div class="flex items-center gap-2 overflow-x-auto pb-1" id="server-list-container"></div>
