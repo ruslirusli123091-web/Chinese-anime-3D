@@ -415,6 +415,7 @@
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
         
+        // --- [START PERBAIKAN] ---
         // INIT
         (async function initApp() {
             const savedSession = localStorage.getItem('user_auth');
@@ -422,7 +423,8 @@
             const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             activeScheduleDay = daysMap[new Date().getDay()];
             renderSchedButtons();
-            checkRoute(); 
+            
+            // Tunggu data selesai di-load dulu, BARU jalankan routing
             await fetchContent(); 
             checkRoute();
         })();
@@ -431,7 +433,12 @@
         window.addEventListener('popstate', checkRoute);
 
         async function fetchContent() {
-            if(appData.donghua.length === 0) document.getElementById('loading').classList.remove('hide');
+            // Tampilkan loading hanya jika data benar-benar kosong
+            if(appData.donghua.length === 0) {
+                 document.getElementById('loading').classList.remove('hide');
+                 // Tampilkan halaman home dengan skeleton agar tidak blank saat loading
+                 document.getElementById('view-home').classList.remove('hide');
+            }
             try { const r = await fetch(`${CONFIG.workerUrl}/api/donghua`); const j = await r.json(); appData.donghua = j.donghua || []; } catch(e){}
             document.getElementById('loading').classList.add('hide');
             document.getElementById('hero-banner-container').classList.remove('skeleton');
@@ -451,7 +458,12 @@
             if (page !== 'watch' && videoFrame) videoFrame.src = "";
             if(bannerInterval) clearInterval(bannerInterval);
 
-            if(appData.donghua.length === 0 && !page) { document.getElementById('view-home').classList.remove('hide'); return; }
+            // Jika data belum ada saat routing, tampilkan home (akan ditimpa jika page lain)
+            if(appData.donghua.length === 0) { 
+                document.getElementById('view-home').classList.remove('hide'); 
+                // Jika data masih loading, jangan jalankan logika halaman lain dulu
+                if (document.getElementById('loading').classList.contains('hide') === false) return;
+            }
 
             if(page === 'auth') { 
                 if(currentUser){ navigateTo('?page=profile'); return; } 
@@ -467,6 +479,7 @@
             else { document.getElementById('view-home').classList.remove('hide'); document.getElementById('nav-home').classList.add('active'); renderHome(); }
             window.scrollTo(0, 0);
         }
+        // --- [END PERBAIKAN] ---
 
         function navigateTo(u) { window.history.pushState({}, '', u); checkRoute(); }
         function navigateToAccount() { if (currentUser) navigateTo('?page=profile'); else navigateTo('?page=auth'); }
@@ -609,9 +622,16 @@
             } 
             navigateTo(`?page=synopsis&id=${id}`); 
         }
-
+        
+        // --- [START PERBAIKAN] ---
         function loadSynopsis(id) {
-            const i = appData.donghua.find(d => d.id == id); if(!i) return;
+            const i = appData.donghua.find(d => d.id == id); 
+            // Tambahkan "Pengaman" / Guard Clause
+            if (!i) {
+                console.error("Synopsis Gagal: Anime dengan ID " + id + " tidak ditemukan.");
+                return navigateTo('/'); // Alihkan ke beranda jika anime tidak ada
+            }
+
             document.getElementById('syn-title').innerText = i.title; 
             document.getElementById('syn-desc').innerText = i.synopsis; 
             document.getElementById('syn-image').src = i.image;
@@ -621,7 +641,6 @@
             const btnContainer = document.getElementById('synopsis-buttons');
             const isBookmarked = currentUser && (currentUser.bookmarks||[]).includes(id);
             
-            // MANUAL CSS BUTTONS (Sesuai Request: Share Hijau, Fav Abu)
             btnContainer.innerHTML = `
                 <button id="btn-bookmark" onclick="toggleBookmark()" class="btn-action btn-fav">
                     ${isBookmarked ? '❤️ Favorit' : '🤍 Favorit'}
@@ -640,7 +659,21 @@
         }
 
         function loadWatch(id, epNum) {
-            const i = appData.donghua.find(d => d.id == id), e = i.episodes.find(x => x.ep == epNum); if(!e) return;
+            const i = appData.donghua.find(d => d.id == id);
+            // Tambahkan "Pengaman" / Guard Clause untuk Anime
+            if (!i) {
+                console.error("Watch Gagal: Anime dengan ID " + id + " tidak ditemukan.");
+                return navigateTo('/'); // Alihkan ke beranda jika anime tidak ada
+            }
+            
+            const e = i.episodes.find(x => x.ep == epNum);
+            // Tambahkan "Pengaman" / Guard Clause untuk Episode
+            if (!e) {
+                console.error("Watch Gagal: Episode " + epNum + " untuk anime '" + i.title + "' tidak ditemukan.");
+                return navigateTo(`?page=synopsis&id=${id}`); // Alihkan ke sinopsis jika episode tidak ada
+            }
+            
+            // Kode selanjutnya aman untuk dijalankan
             document.getElementById('watch-title').innerText = `${i.title} - Eps ${epNum}`; 
             document.getElementById('watch-views').innerText = `${i.views||0} Views`; 
             document.getElementById('back-link').onclick = (ev) => { ev.preventDefault(); navigateTo(`?page=synopsis&id=${id}`) };
@@ -665,6 +698,7 @@
             fetchChatData().then(() => renderChat(id, epNum)); renderSidebars();
             resetLandscapeMode();
         }
+        // --- [END PERBAIKAN] ---
 
         function parseStreams(u) { if(!u.includes('|')) return [{name:"Default", url:u}]; return u.split('\n').map(l=>{const p=l.split('|'); return p.length>=2?{name:p[0].trim(),url:p.slice(1).join('|').trim()}:null}).filter(Boolean); }
         
