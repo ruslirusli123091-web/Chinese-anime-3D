@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- [PERBAIKAN] Mengaktifkan zoom untuk aksesibilitas -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinese Anime 3D Sub Ai - Nonton Donghua Sub Indo</title>
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
@@ -22,13 +21,11 @@
             --bg-main: #0f172a;
             --bg-card: #1e293b;
             --bg-hover: #334155;
-            /* [PERBAIKAN] Warna sedikit digelapkan untuk kontras lebih baik */
             --primary: #3176e8; 
             --primary-dark: #2563eb;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --green-share: #22c55e;
-             /* [PERBAIKAN] Warna sedikit digelapkan untuk kontras lebih baik */
             --red-hot: #d92626;
             --pink-love: #ec4899;
         }
@@ -153,13 +150,11 @@
         .sidebar-item:hover { background: #1e293b; }
         .sidebar-rank { font-size: 18px; font-weight: bold; color: #64748b; width: 25px; text-align: center; font-style: italic; }
         .sidebar-img { width: 45px; height: 60px; object-fit: cover; border-radius: 4px; background: #1e293b; }
-        /* [PERBAIKAN] Mengganti h4 menjadi class untuk memperbaiki struktur heading */
         .sidebar-title { font-size: 12px; font-weight: bold; color: white; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .sidebar-info p { font-size: 10px; color: #94a3b8; }
 
         /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 50; padding-bottom: env(safe-area-inset-bottom); }
-        /* [PERBAIKAN] Warna diganti untuk kontras lebih baik */
         .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8193b1; font-size: 10px; gap: 4px; width: 100%; height: 100%; }
         .nav-btn svg { width: 24px; height: 24px; }
         .nav-btn.active { color: var(--primary); font-weight: bold; }
@@ -204,7 +199,6 @@
     <!-- HEADER -->
     <header>
         <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="logo" aria-label="Ke Beranda">
-            <!-- [PERBAIKAN] Menambahkan alt text -->
             <img src="logo.png" alt="CA3D Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span style="display:none; font-weight:900; font-style:italic; font-size:18px; color:var(--primary);">CA3D</span>
         </a>
@@ -243,7 +237,6 @@
         <div id="view-synopsis" class="hide">
             <div class="synopsis-container">
                 <div class="synopsis-header">
-                     <!-- [PERBAIKAN] Menambahkan alt text default -->
                     <div class="syn-poster"><img id="syn-image" src="" alt="Poster Donghua"></div>
                     <div class="syn-info">
                         <h1 id="syn-title" class="syn-title">Loading...</h1>
@@ -342,7 +335,7 @@
                     <input type="password" id="reg-pass" class="auth-input" placeholder="Password" autocomplete="new-password">
                     <button type="submit" class="btn-auth-submit" style="background: var(--green-share);">Buat Akun</button>
                 </form>
-                <p id="auth-msg" style="text-align: center; font-size: 12px; margin-top: 10px; color: var(--yellow-400);"></p>
+                <p id="auth-msg" style="text-align: center; font-size: 12px; margin-top: 10px; color: #f59e0b;"></p>
             </div>
         </div>
 
@@ -467,6 +460,42 @@
                 } else { document.getElementById('auth-msg').innerText = res.error || "Gagal Login"; }
             } catch(e) { document.getElementById('auth-msg').innerText = "Error Jaringan"; }
         }
+
+        // --- [PERBAIKAN] Fungsi Registrasi ditambahkan ---
+        async function handleRegister() {
+            const u = document.getElementById('reg-user').value.trim();
+            const p = document.getElementById('reg-pass').value.trim();
+            const msgEl = document.getElementById('auth-msg');
+
+            if (!u || !p) return msgEl.innerText = "Isi semua kolom";
+            if (p.length < 6) return msgEl.innerText = "Password minimal 6 karakter";
+            
+            msgEl.innerText = "Mendaftarkan...";
+            const hashedUser = await hashString(u);
+            const hashedPass = await hashPass(p);
+
+            try {
+                // Pastikan endpoint API worker Anda mendukung /register
+                const req = await fetch(`${CONFIG.workerUrl}/api/member/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: hashedUser, password: hashedPass })
+                });
+                const res = await req.json();
+
+                if (req.ok && res.status === 'Success') {
+                    msgEl.innerText = "Registrasi berhasil! Silakan masuk.";
+                    switchAuthMode('login');
+                    document.getElementById('login-user').value = u;
+                    document.getElementById('login-pass').value = "";
+                } else {
+                    msgEl.innerText = res.error || "Gagal mendaftar, username mungkin sudah ada.";
+                }
+            } catch (e) {
+                msgEl.innerText = "Error Jaringan";
+            }
+        }
+
         function userLogout() { currentUser = null; localStorage.removeItem('user_auth'); navigateTo('/'); }
         function switchAuthMode(m) { 
             const l=document.getElementById('tab-login'), r=document.getElementById('tab-register');
@@ -503,7 +532,6 @@
             
             pageData.forEach(i => { 
                 const latestEp = getLatestEp(i.episodes); 
-                // [PERBAIKAN] Menambahkan alt text pada gambar
                 c.innerHTML += `
                 <div onclick="openSynopsisAndTrack('${i.id}')" class="movie-card">
                     <img src="${i.image}" alt="${i.title}" loading="lazy" class="poster-card" onload="this.classList.add('loaded')">
@@ -568,7 +596,6 @@
              ['popular-list-home', 'popular-list-syn', 'popular-list-watch'].forEach(id => {
                  const el = document.getElementById(id); if(el) { 
                      el.innerHTML = ""; 
-                     // [PERBAIKAN] Menambahkan alt text dan mengganti <h4> dengan <div>
                      s.forEach((i, x) => el.innerHTML += `
                      <div onclick="openSynopsisAndTrack('${i.id}')" class="sidebar-item">
                         <div class="sidebar-rank">${x+1}</div>
@@ -599,7 +626,6 @@
             document.getElementById('syn-desc').innerText = i.synopsis; 
             const synImage = document.getElementById('syn-image');
             synImage.src = i.image;
-            // [PERBAIKAN] Mengupdate alt text
             synImage.alt = i.title; 
             document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length||0)+" Eps"; 
             document.getElementById('syn-views').innerText = (i.views||0)+" Views";
@@ -656,7 +682,7 @@
             resetLandscapeMode();
         }
 
-        function parseStreams(u) { if(!u.includes('|')) return [{name:"Default", url:u}]; return u.split('\n').map(l=>{const p=l.split('|'); return p.length>=2?{name:p[0].trim(),url:p.slice(1).join('|').trim()}:null}).filter(Boolean); }
+        function parseStreams(u) { if(!u || !u.includes('|')) return [{name:"Default", url:u}]; return u.split('\n').map(l=>{const p=l.split('|'); return p.length>=2?{name:p[0].trim(),url:p.slice(1).join('|').trim()}:null}).filter(Boolean); }
         
         function renderServerButtons(s) { 
             const c = document.getElementById('server-list-container'); c.innerHTML = ""; 
@@ -668,8 +694,64 @@
             }); 
         }
 
-        async function sendChat(dId, ep) { const inp=document.getElementById('chat-input'); if(!inp.value.trim())return; const newChat={id:Date.now().toString(), donghuaId:dId, ep, user:currentUser?currentUser.display_name:"User", text:inp.value.trim(), timestamp:Date.now()}; try { const r=await fetch(`${CONFIG.workerUrl}/api/chat`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",comment:newChat})}); if(r.ok){ inp.value=""; chatData.comments.push(newChat); renderChat(dId, ep); } } catch(e){} }
-        function renderChat(dId, ep) { const c=document.getElementById('chat-container'), a=document.getElementById('chat-input-area'); if(currentUser) a.innerHTML=`<input type="text" id="chat-input" class="chat-input" placeholder="Ketik..."><button onclick="sendChat('${dId}','${ep}')" class="btn-send">Kirim</button>`; else a.innerHTML=`<button onclick="navigateTo('?page=auth')" class="btn-server" style="width:100%">Login untuk Chat</button>`; const msgs=chatData.comments.filter(x=>x.donghuaId===dId && x.ep==ep).sort((a,b)=>a.timestamp-b.timestamp); c.innerHTML=msgs.length?"":`<div style="text-align:center;color:#64748b;font-size:10px;margin-top:20px;">Belum ada komentar</div>`; msgs.forEach(m=>{ c.innerHTML+=`<div class="chat-bubble"><div class="chat-user">${m.user}</div><div class="chat-text">${m.text}</div></div>`; }); c.scrollTop=c.scrollHeight; }
+        async function sendChat(dId, ep) { 
+            const inp=document.getElementById('chat-input'); if(!inp || !inp.value.trim())return; 
+            const chatText = inp.value.trim();
+            const newChat={id:Date.now().toString(), donghuaId:dId, ep, user:currentUser?currentUser.display_name:"User", text:chatText, timestamp:Date.now()}; 
+            try { 
+                inp.value = ""; // Langsung kosongkan setelah diambil
+                const r=await fetch(`${CONFIG.workerUrl}/api/chat`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",comment:newChat})}); 
+                if(r.ok){ 
+                    chatData.comments.push(newChat); 
+                    renderChat(dId, ep); 
+                } else {
+                    inp.value = chatText; // Kembalikan teks jika gagal kirim
+                    alert("Gagal mengirim chat.");
+                }
+            } catch(e){
+                inp.value = chatText; // Kembalikan teks jika ada error jaringan
+                alert("Gagal mengirim chat karena masalah jaringan.");
+            } 
+        }
+
+        // --- [PERBAIKAN] Fungsi renderChat diubah untuk menggunakan event listener ---
+        function renderChat(dId, ep) {
+            const c = document.getElementById('chat-container');
+            const a = document.getElementById('chat-input-area');
+            
+            a.innerHTML = ""; // Selalu kosongkan area input terlebih dahulu
+
+            if (currentUser) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'chat-input';
+                input.className = 'chat-input';
+                input.placeholder = 'Ketik...';
+                
+                const button = document.createElement('button');
+                button.className = 'btn-send';
+                button.textContent = 'Kirim';
+                
+                button.addEventListener('click', () => sendChat(dId, ep));
+                input.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        sendChat(dId, ep);
+                    }
+                });
+
+                a.appendChild(input);
+                a.appendChild(button);
+
+            } else {
+                a.innerHTML = `<button onclick="navigateTo('?page=auth')" class="btn-server" style="width:100%">Login untuk Chat</button>`;
+            }
+
+            const msgs = chatData.comments.filter(x => x.donghuaId === dId && x.ep == ep).sort((a, b) => a.timestamp - b.timestamp);
+            c.innerHTML = msgs.length ? "" : `<div style="text-align:center;color:#64748b;font-size:10px;margin-top:20px;">Belum ada komentar</div>`;
+            msgs.forEach(m => { c.innerHTML += `<div class="chat-bubble"><div class="chat-user">${m.user}</div><div class="chat-text">${m.text}</div></div>`; });
+            c.scrollTop = c.scrollHeight;
+        }
 
         function renderSchedButtons() { const d=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"]; const c=document.getElementById('sched-buttons-container'); c.innerHTML=""; d.forEach(day => { c.innerHTML += `<button onclick="switchScheduleTab('${day}')" id="btn-${day}" class="sched-btn">${day}</button>`; }); }
         function switchScheduleTab(day) { activeScheduleDay=day; document.querySelectorAll('.sched-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`btn-${day}`).classList.add('active'); const c=document.getElementById('schedule-content-grid'); c.innerHTML=""; const list=appData.donghua.filter(d=>d.day && d.day.includes(day)); list.forEach(i=>{ c.innerHTML+=`<div onclick="openSynopsisAndTrack('${i.id}')" class="movie-card"><img src="${i.image}" alt="${i.title}" class="poster-card loaded"><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); if(list.length===0) c.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:#64748b;">Libur</div>`; }
@@ -681,7 +763,6 @@
             const c=document.getElementById('profile-content-list'); c.innerHTML=""; 
             let data = currentProfileTab==='bookmark' ? (currentUser.bookmarks||[]).map(id=>appData.donghua.find(d=>d.id==id)).filter(Boolean) : (currentUser.history||[]).map(h=>{const d=appData.donghua.find(x=>x.id==h.id); return d?{...d,lastEp:h.ep}:null}).filter(Boolean);
             if(data.length===0) c.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:#64748b;">Kosong</div>`; 
-            // [PERBAIKAN] Menambahkan alt text
             data.forEach(i=>{ c.innerHTML+=`<div onclick="${currentProfileTab==='history'?`navigateTo('?page=watch&id=${i.id}&ep=${i.lastEp}')`:`openSynopsisAndTrack('${i.id}')`}" class="movie-card"><img src="${i.image}" alt="${i.title}" class="poster-card loaded"><div class="ep-badge">${currentProfileTab==='history'?'EP '+i.lastEp:'♥'}</div><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); 
         }
         function switchProfileTab(t) { currentProfileTab=t; renderProfile(); }
@@ -691,7 +772,6 @@
             if(!v){b.classList.add('hide');return;} 
             const r=appData.donghua.filter(d=>d.title.toLowerCase().includes(v.toLowerCase())).slice(0,5); 
             b.innerHTML=r.length?"":`<div style="padding:10px;text-align:center;font-size:12px;">Tidak ditemukan</div>`; 
-            // [PERBAIKAN] Menambahkan alt text
             r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="search-item"><img src="${i.image}" alt="${i.title}"><div><div style="font-weight:bold;font-size:12px;">${i.title}</div></div></div>`}); 
             b.classList.remove('hide'); 
         }
