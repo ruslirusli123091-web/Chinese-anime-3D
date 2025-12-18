@@ -7,8 +7,9 @@
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
     <meta name="theme-color" content="#0f172a">
 
-    <!-- PRECONNECT -->
-    <link rel="preconnect" href="https://backup3d.ruslirusli123091.workers.dev">
+    <!-- [PERBAIKAN] Preconnect juga ke host gambar yang paling umum digunakan -->
+    <link rel="preconnect" href="https://backup3d.ruslirusli123091.workers.dev" crossorigin>
+    <link rel="preconnect" href="https://imgpx.com" crossorigin>
     <link rel="icon" href="favicon.ico" sizes="any">
 
     <!-- IKLAN -->
@@ -21,8 +22,9 @@
             --bg-main: #0f172a;
             --bg-card: #1e293b;
             --bg-hover: #334155;
-            --primary: #3176e8; 
-            --primary-dark: #2563eb;
+            /* [PERBAIKAN] Warna digelapkan untuk kontras tombol banner */
+            --primary: #2572f5;
+            --primary-dark: #1c5bcf;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --green-share: #22c55e;
@@ -55,7 +57,8 @@
         .banner-container { position: relative; width: 100%; aspect-ratio: 16/9; max-height: 400px; border-radius: 16px; overflow: hidden; background: #1e293b; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
         .banner-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
         .banner-slide.active { opacity: 1; pointer-events: auto; }
-        .banner-bg { width: 100%; height: 100%; background-size: cover; background-position: center; }
+        /* [PERBAIKAN] Struktur banner diubah ke <img> */
+        .banner-img { width: 100%; height: 100%; object-fit: cover; }
         .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0f172a 5%, transparent 90%); }
         .banner-content { position: absolute; bottom: 0; left: 0; padding: 20px; width: 100%; z-index: 2; }
         .badge-hot { background: var(--red-hot); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: inline-block; }
@@ -155,7 +158,8 @@
 
         /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 50; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8193b1; font-size: 10px; gap: 4px; width: 100%; height: 100%; }
+        /* [PERBAIKAN] Warna diganti untuk kontras lebih baik */
+        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a2b4d3; font-size: 10px; gap: 4px; width: 100%; height: 100%; }
         .nav-btn svg { width: 24px; height: 24px; }
         .nav-btn.active { color: var(--primary); font-weight: bold; }
 
@@ -199,7 +203,8 @@
     <!-- HEADER -->
     <header>
         <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="logo" aria-label="Ke Beranda">
-            <img src="logo.png" alt="CA3D Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <!-- [PERBAIKAN] Menambahkan width dan height untuk mencegah CLS -->
+            <img src="logo.png" alt="CA3D Logo" width="107" height="40" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <span style="display:none; font-weight:900; font-style:italic; font-size:18px; color:var(--primary);">CA3D</span>
         </a>
         <div class="search-box">
@@ -237,7 +242,7 @@
         <div id="view-synopsis" class="hide">
             <div class="synopsis-container">
                 <div class="synopsis-header">
-                    <div class="syn-poster"><img id="syn-image" src="" alt="Poster Donghua"></div>
+                    <div class="syn-poster"><img id="syn-image" src="" alt="Poster Donghua" width="110" height="165"></div>
                     <div class="syn-info">
                         <h1 id="syn-title" class="syn-title">Loading...</h1>
                         <div class="syn-meta">
@@ -381,6 +386,24 @@
         let currentProfileTab = 'bookmark'; let currentBannerIndex = 0; let bannerInterval;
         let activeScheduleDay = 'Senin';
 
+        // --- [START PERBAIKAN] ---
+        // Helper function untuk optimasi URL gambar
+        function getOptimizedImageUrl(url, width) {
+            if (!url) return "";
+            // Hanya berlaku untuk imgpx.com, bisa ditambahkan domain lain jika perlu
+            if (url.includes("imgpx.com")) {
+                try {
+                    // Coba tambahkan parameter ?w={width}
+                    const urlObj = new URL(url);
+                    urlObj.searchParams.set('w', width);
+                    return urlObj.toString();
+                } catch (e) {
+                    return url; // Jika URL tidak valid, kembalikan original
+                }
+            }
+            return url;
+        }
+        
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
         function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
@@ -461,7 +484,6 @@
             } catch(e) { document.getElementById('auth-msg').innerText = "Error Jaringan"; }
         }
 
-        // --- [PERBAIKAN] Fungsi Registrasi ditambahkan ---
         async function handleRegister() {
             const u = document.getElementById('reg-user').value.trim();
             const p = document.getElementById('reg-pass').value.trim();
@@ -475,25 +497,15 @@
             const hashedPass = await hashPass(p);
 
             try {
-                // Pastikan endpoint API worker Anda mendukung /register
-                const req = await fetch(`${CONFIG.workerUrl}/api/member/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: hashedUser, password: hashedPass })
-                });
+                const req = await fetch(`${CONFIG.workerUrl}/api/member/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: hashedUser, password: hashedPass }) });
                 const res = await req.json();
-
                 if (req.ok && res.status === 'Success') {
                     msgEl.innerText = "Registrasi berhasil! Silakan masuk.";
                     switchAuthMode('login');
                     document.getElementById('login-user').value = u;
                     document.getElementById('login-pass').value = "";
-                } else {
-                    msgEl.innerText = res.error || "Gagal mendaftar, username mungkin sudah ada.";
-                }
-            } catch (e) {
-                msgEl.innerText = "Error Jaringan";
-            }
+                } else { msgEl.innerText = res.error || "Gagal mendaftar, username mungkin sudah ada."; }
+            } catch (e) { msgEl.innerText = "Error Jaringan"; }
         }
 
         function userLogout() { currentUser = null; localStorage.removeItem('user_auth'); navigateTo('/'); }
@@ -534,7 +546,7 @@
                 const latestEp = getLatestEp(i.episodes); 
                 c.innerHTML += `
                 <div onclick="openSynopsisAndTrack('${i.id}')" class="movie-card">
-                    <img src="${i.image}" alt="${i.title}" loading="lazy" class="poster-card" onload="this.classList.add('loaded')">
+                    <img src="${getOptimizedImageUrl(i.image, 400)}" alt="${i.title}" loading="lazy" class="poster-card" width="200" height="300" onload="this.classList.add('loaded')">
                     <div class="ep-badge">EP ${latestEp}</div>
                     <div class="movie-info">
                         <div class="movie-title">${i.title}</div>
@@ -554,17 +566,29 @@
         }
         function changePage(n) { currentPage = n; renderHome(); window.scrollTo({top:0, behavior:'smooth'}); }
 
+        // [PERBAIKAN] renderBanner diubah total untuk LCP
         function renderBanner() {
             const sorted = [...appData.donghua].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
             const wrapper = document.getElementById('banner-wrapper'), dots = document.getElementById('banner-dots');
             if(sorted.length === 0) return;
             currentBannerIndex = 0; wrapper.innerHTML = ""; dots.innerHTML = "";
             
-            sorted.slice(0, 5).forEach((item, index) => {
+            const bannerItems = sorted.slice(0, 5);
+            bannerItems.forEach((item, index) => {
                 const latestEp = getLatestEp(item.episodes);
+                const isActive = index === 0;
+
+                // Gunakan gambar resolusi lebih tinggi untuk banner
+                const bannerImageUrl = getOptimizedImageUrl(item.image, 800);
+
                 wrapper.innerHTML += `
-                <div class="banner-slide ${index===0?'active':''}">
-                    <div class="banner-bg" style="background-image: url('${item.image}');"></div>
+                <div class="banner-slide ${isActive ? 'active' : ''}">
+                    <img src="${bannerImageUrl}" 
+                         alt="${item.title}" 
+                         class="banner-img" 
+                         width="800" height="450" 
+                         ${isActive ? 'fetchpriority="high"' : 'loading="lazy"'}
+                    >
                     <div class="banner-overlay"></div>
                     <div class="banner-content">
                         <div class="badge-hot">HOT UPDATE</div>
@@ -575,12 +599,13 @@
                     </div>
                 </div>`;
                 const dot = document.createElement('div'); 
-                dot.className = `dot ${index===0?'active':''}`; 
+                dot.className = `dot ${isActive ? 'active' : ''}`; 
                 dot.onclick = (e) => { e.stopPropagation(); changeBanner(index); resetBannerInterval(); }; 
                 dots.appendChild(dot);
             });
-            startBannerSlider(sorted.slice(0,5).length);
+            startBannerSlider(bannerItems.length);
         }
+
         function changeBanner(i) { 
             const s=document.querySelectorAll('.banner-slide'), d=document.querySelectorAll('.dot'); 
             if(s.length===0)return; 
@@ -599,7 +624,7 @@
                      s.forEach((i, x) => el.innerHTML += `
                      <div onclick="openSynopsisAndTrack('${i.id}')" class="sidebar-item">
                         <div class="sidebar-rank">${x+1}</div>
-                        <img src="${i.image}" alt="${i.title}" class="sidebar-img">
+                        <img src="${getOptimizedImageUrl(i.image, 100)}" alt="${i.title}" class="sidebar-img" width="45" height="60">
                         <div class="sidebar-info">
                             <div class="sidebar-title">${i.title}</div>
                             <p>${i.views||0} Views</p>
@@ -625,7 +650,7 @@
             document.getElementById('syn-title').innerText = i.title; 
             document.getElementById('syn-desc').innerText = i.synopsis; 
             const synImage = document.getElementById('syn-image');
-            synImage.src = i.image;
+            synImage.src = getOptimizedImageUrl(i.image, 220);
             synImage.alt = i.title; 
             document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length||0)+" Eps"; 
             document.getElementById('syn-views').innerText = (i.views||0)+" Views";
@@ -653,7 +678,6 @@
         function loadWatch(id, epNum) {
             const i = appData.donghua.find(d => d.id == id);
             if (!i) { return navigateTo('/'); }
-            
             const e = i.episodes.find(x => x.ep == epNum);
             if (!e) { return navigateTo(`?page=synopsis&id=${id}`); }
             
@@ -699,54 +723,28 @@
             const chatText = inp.value.trim();
             const newChat={id:Date.now().toString(), donghuaId:dId, ep, user:currentUser?currentUser.display_name:"User", text:chatText, timestamp:Date.now()}; 
             try { 
-                inp.value = ""; // Langsung kosongkan setelah diambil
+                inp.value = ""; 
                 const r=await fetch(`${CONFIG.workerUrl}/api/chat`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",comment:newChat})}); 
-                if(r.ok){ 
-                    chatData.comments.push(newChat); 
-                    renderChat(dId, ep); 
-                } else {
-                    inp.value = chatText; // Kembalikan teks jika gagal kirim
-                    alert("Gagal mengirim chat.");
-                }
-            } catch(e){
-                inp.value = chatText; // Kembalikan teks jika ada error jaringan
-                alert("Gagal mengirim chat karena masalah jaringan.");
-            } 
+                if(r.ok){ chatData.comments.push(newChat); renderChat(dId, ep); } 
+                else { inp.value = chatText; alert("Gagal mengirim chat."); }
+            } catch(e){ inp.value = chatText; alert("Gagal mengirim chat karena masalah jaringan."); } 
         }
 
-        // --- [PERBAIKAN] Fungsi renderChat diubah untuk menggunakan event listener ---
         function renderChat(dId, ep) {
             const c = document.getElementById('chat-container');
             const a = document.getElementById('chat-input-area');
-            
-            a.innerHTML = ""; // Selalu kosongkan area input terlebih dahulu
-
+            a.innerHTML = ""; 
             if (currentUser) {
                 const input = document.createElement('input');
-                input.type = 'text';
-                input.id = 'chat-input';
-                input.className = 'chat-input';
-                input.placeholder = 'Ketik...';
-                
+                input.type = 'text'; input.id = 'chat-input'; input.className = 'chat-input'; input.placeholder = 'Ketik...';
                 const button = document.createElement('button');
-                button.className = 'btn-send';
-                button.textContent = 'Kirim';
-                
+                button.className = 'btn-send'; button.textContent = 'Kirim';
                 button.addEventListener('click', () => sendChat(dId, ep));
-                input.addEventListener('keypress', (event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        sendChat(dId, ep);
-                    }
-                });
-
-                a.appendChild(input);
-                a.appendChild(button);
-
+                input.addEventListener('keypress', (event) => { if (event.key === 'Enter') { event.preventDefault(); sendChat(dId, ep); } });
+                a.appendChild(input); a.appendChild(button);
             } else {
                 a.innerHTML = `<button onclick="navigateTo('?page=auth')" class="btn-server" style="width:100%">Login untuk Chat</button>`;
             }
-
             const msgs = chatData.comments.filter(x => x.donghuaId === dId && x.ep == ep).sort((a, b) => a.timestamp - b.timestamp);
             c.innerHTML = msgs.length ? "" : `<div style="text-align:center;color:#64748b;font-size:10px;margin-top:20px;">Belum ada komentar</div>`;
             msgs.forEach(m => { c.innerHTML += `<div class="chat-bubble"><div class="chat-user">${m.user}</div><div class="chat-text">${m.text}</div></div>`; });
@@ -754,7 +752,7 @@
         }
 
         function renderSchedButtons() { const d=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"]; const c=document.getElementById('sched-buttons-container'); c.innerHTML=""; d.forEach(day => { c.innerHTML += `<button onclick="switchScheduleTab('${day}')" id="btn-${day}" class="sched-btn">${day}</button>`; }); }
-        function switchScheduleTab(day) { activeScheduleDay=day; document.querySelectorAll('.sched-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`btn-${day}`).classList.add('active'); const c=document.getElementById('schedule-content-grid'); c.innerHTML=""; const list=appData.donghua.filter(d=>d.day && d.day.includes(day)); list.forEach(i=>{ c.innerHTML+=`<div onclick="openSynopsisAndTrack('${i.id}')" class="movie-card"><img src="${i.image}" alt="${i.title}" class="poster-card loaded"><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); if(list.length===0) c.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:#64748b;">Libur</div>`; }
+        function switchScheduleTab(day) { activeScheduleDay=day; document.querySelectorAll('.sched-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`btn-${day}`).classList.add('active'); const c=document.getElementById('schedule-content-grid'); c.innerHTML=""; const list=appData.donghua.filter(d=>d.day && d.day.includes(day)); list.forEach(i=>{ c.innerHTML+=`<div onclick="openSynopsisAndTrack('${i.id}')" class="movie-card"><img src="${getOptimizedImageUrl(i.image, 400)}" alt="${i.title}" class="poster-card loaded" width="200" height="300"><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); if(list.length===0) c.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:#64748b;">Libur</div>`; }
 
         function renderProfile() { 
             document.getElementById('profile-name').innerText = currentUser?currentUser.display_name:"User"; 
@@ -763,7 +761,7 @@
             const c=document.getElementById('profile-content-list'); c.innerHTML=""; 
             let data = currentProfileTab==='bookmark' ? (currentUser.bookmarks||[]).map(id=>appData.donghua.find(d=>d.id==id)).filter(Boolean) : (currentUser.history||[]).map(h=>{const d=appData.donghua.find(x=>x.id==h.id); return d?{...d,lastEp:h.ep}:null}).filter(Boolean);
             if(data.length===0) c.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:#64748b;">Kosong</div>`; 
-            data.forEach(i=>{ c.innerHTML+=`<div onclick="${currentProfileTab==='history'?`navigateTo('?page=watch&id=${i.id}&ep=${i.lastEp}')`:`openSynopsisAndTrack('${i.id}')`}" class="movie-card"><img src="${i.image}" alt="${i.title}" class="poster-card loaded"><div class="ep-badge">${currentProfileTab==='history'?'EP '+i.lastEp:'♥'}</div><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); 
+            data.forEach(i=>{ c.innerHTML+=`<div onclick="${currentProfileTab==='history'?`navigateTo('?page=watch&id=${i.id}&ep=${i.lastEp}')`:`openSynopsisAndTrack('${i.id}')`}" class="movie-card"><img src="${getOptimizedImageUrl(i.image, 400)}" alt="${i.title}" class="poster-card loaded" width="200" height="300"><div class="ep-badge">${currentProfileTab==='history'?'EP '+i.lastEp:'♥'}</div><div class="movie-info"><div class="movie-title">${i.title}</div></div></div>`; }); 
         }
         function switchProfileTab(t) { currentProfileTab=t; renderProfile(); }
 
@@ -772,7 +770,7 @@
             if(!v){b.classList.add('hide');return;} 
             const r=appData.donghua.filter(d=>d.title.toLowerCase().includes(v.toLowerCase())).slice(0,5); 
             b.innerHTML=r.length?"":`<div style="padding:10px;text-align:center;font-size:12px;">Tidak ditemukan</div>`; 
-            r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="search-item"><img src="${i.image}" alt="${i.title}"><div><div style="font-weight:bold;font-size:12px;">${i.title}</div></div></div>`}); 
+            r.forEach(i=>{b.innerHTML+=`<div onclick="navigateTo('?page=synopsis&id=${i.id}');document.getElementById('search-results').classList.add('hide');" class="search-item"><img src="${getOptimizedImageUrl(i.image, 100)}" alt="${i.title}" width="35" height="50"><div><div style="font-weight:bold;font-size:12px;">${i.title}</div></div></div>`}); 
             b.classList.remove('hide'); 
         }
         document.addEventListener('click', e=>{if(!e.target.closest('.search-box'))document.getElementById('search-results').classList.add('hide')});
