@@ -399,7 +399,7 @@
       }
 
 
-      // --- (FUNGSI LAMA TAB ANIME TIDAK BERUBAH) ---
+      // --- (FUNGSI HELPER UI) ---
       function addEpisodeRow(n = "", u = "") { 
           const c = document.getElementById('episode-container'); 
           const d = document.createElement('div'); 
@@ -456,16 +456,32 @@
           } catch (e) { alert("Error Worker: " + e.message); }
       }
 
+      // --- NEW DELETE FUNCTION (FIXED) ---
       async function deleteData(id) {
           const secretPass = sessionStorage.getItem('admin_secret_temp');
+          
           if (!secretPass) return showReauthPopup(() => deleteData(id));
           if (!confirm("Yakin hapus? Data hilang permanen.")) return;
-          const originalData = [...appData.donghua]; appData.donghua = appData.donghua.filter(x => x.id != id);
+
           try {
-              const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ donghua: appData.donghua }) });
-              if (r.ok) { renderAdminList(); } else if (r.status === 401) { appData.donghua = originalData; showReauthPopup(() => deleteData(id)); } else { alert("Gagal menghapus."); appData.donghua = originalData; }
-          } catch (e) { alert("Error Network"); appData.donghua = originalData; }
+              const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, {
+                  method: "DELETE", // Changed from PUT
+                  headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass },
+                  body: JSON.stringify({ id: id }) // Send ID only
+              });
+
+              if (r.ok) {
+                  appData.donghua = appData.donghua.filter(x => x.id != id);
+                  renderAdminList();
+                  alert("Berhasil dihapus!");
+              } else if (r.status === 401) {
+                  showReauthPopup(() => deleteData(id));
+              } else {
+                  alert("Gagal menghapus.");
+              }
+          } catch (e) { alert("Error Network: " + e.message); }
       }
+
       function downloadSitemap() { alert("Sitemap generated"); }
       async function updateAdminCredentials() { alert("Fitur update password admin"); }
   </script>
