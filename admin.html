@@ -19,6 +19,9 @@
       .tab-nav-btn { flex: 1; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; transition: all 0.2s; }
       .tab-nav-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
       .tab-nav-btn:hover { color: #cbd5e1; background: rgba(255,255,255,0.05); }
+      
+      /* Dropdown Style agar sama dengan input lain */
+      select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 1em; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans text-sm pb-10">
@@ -85,6 +88,13 @@
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div class="space-y-3">
                               <input type="text" id="inp-title" placeholder="Judul Anime" class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
+                              
+                              <!-- [BARU] Input Tipe (Style disamakan dengan original) -->
+                              <select id="inp-type" class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
+                                  <option value="series">Tipe: Series (Donghua)</option>
+                                  <option value="movie">Tipe: Movie</option>
+                              </select>
+
                               <input type="text" id="inp-img" placeholder="Poster URL (https://...)" class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
                               <textarea id="inp-desc" placeholder="Sinopsis..." class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none" rows="3"></textarea>
                               <textarea id="inp-notify-msg" placeholder="Pesan Telegram (Opsional)..." class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none" rows="2"></textarea>
@@ -258,19 +268,12 @@
 
       // --- TAB NAVIGATION ---
       function switchTab(tabName) {
-          // Hide all
           document.getElementById('tab-anime').classList.add('hide');
           document.getElementById('tab-chat').classList.add('hide');
           document.getElementById('tab-users').classList.add('hide');
-          
-          // Reset buttons
           document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.remove('active'));
-          
-          // Show selected
           document.getElementById(`tab-${tabName}`).classList.remove('hide');
           document.getElementById(`btn-tab-${tabName}`).classList.add('active');
-          
-          // Load data specific to tab
           if(tabName === 'chat') fetchChatAdmin();
           if(tabName === 'users') fetchBannedUsers();
       }
@@ -316,52 +319,49 @@
           sorted.forEach(i => { 
               const isScheduled = i.scheduledTime && i.scheduledTime > Date.now(); 
               const statusBadge = isScheduled ? '<span class="text-[9px] bg-yellow-600 text-white px-1.5 py-0.5 rounded ml-2 font-bold animate-pulse">⏳ SCHEDULED</span>' : ''; 
-              t.innerHTML += `<tr class="border-b border-slate-700 hover:bg-slate-750 transition"><td class="p-3 w-14"><img src="${i.image}" class="w-10 h-14 bg-black object-cover rounded shadow"></td><td class="p-3 text-white"><div class="font-bold text-sm">${i.title} ${statusBadge}</div><div class="text-xs text-gray-500 mt-1">${i.episodes?.length || 0} eps • ${i.views || 0} views • ${i.day || '-'}</div></td><td class="p-3 text-right"><button onclick="editData('${i.id}')" class="bg-blue-900/50 text-blue-400 border border-blue-900 px-3 py-1 rounded text-xs mr-2 hover:bg-blue-900">EDIT</button><button onclick="deleteData('${i.id}')" class="bg-red-900/50 text-red-400 border border-red-900 px-3 py-1 rounded text-xs hover:bg-red-900">HAPUS</button></td></tr>`; 
+              const typeBadge = i.type === 'movie' ? '<span class="text-[9px] bg-purple-600 text-white px-1.5 py-0.5 rounded ml-2 font-bold">MOVIE</span>' : '<span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded ml-2 font-bold">SERIES</span>';
+              
+              t.innerHTML += `
+              <tr class="border-b border-slate-700 hover:bg-slate-750 transition">
+                <td class="p-3 w-14"><img src="${i.image}" class="w-10 h-14 bg-black object-cover rounded shadow"></td>
+                <td class="p-3 text-white">
+                    <div class="font-bold text-sm">${i.title} ${typeBadge} ${statusBadge}</div>
+                    <div class="text-xs text-gray-500 mt-1">${i.episodes?.length || 0} eps • ${i.views || 0} views • ${i.day || '-'}</div>
+                </td>
+                <td class="p-3 text-right">
+                    <button onclick="editData('${i.id}')" class="bg-blue-900/50 text-blue-400 border border-blue-900 px-3 py-1 rounded text-xs mr-2 hover:bg-blue-900">EDIT</button>
+                    <button onclick="deleteData('${i.id}')" class="bg-red-900/50 text-red-400 border border-red-900 px-3 py-1 rounded text-xs hover:bg-red-900">HAPUS</button>
+                </td>
+              </tr>`; 
           }); 
       }
 
       function renderChatAdmin() {
           const t = document.getElementById('chat-admin-list');
           t.innerHTML = "";
-          const sorted = [...appData.chats].sort((a,b) => b.timestamp - a.timestamp); // Terbaru diatas
-          
-          if(sorted.length === 0) {
-              t.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Tidak ada chat</td></tr>';
-              return;
-          }
-
+          const sorted = [...appData.chats].sort((a,b) => b.timestamp - a.timestamp); 
+          if(sorted.length === 0) { t.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Tidak ada chat</td></tr>'; return; }
           sorted.forEach(c => {
-              // Cari judul donghua
               const dh = appData.donghua.find(x => x.id == c.donghuaId);
               const title = dh ? dh.title : "Unknown ID";
-              
               t.innerHTML += `
               <tr class="border-b border-slate-800 hover:bg-slate-800 transition">
                   <td class="p-3 text-[10px] text-gray-500 whitespace-nowrap">${timeAgo(c.timestamp)}</td>
                   <td class="p-3 font-bold text-blue-400 whitespace-nowrap">${c.user}</td>
-                  <td class="p-3">
-                      <div class="text-white break-words">${c.text}</div>
-                      <div class="text-[9px] text-gray-600 mt-1">@ ${title} - Ep ${c.ep}</div>
-                  </td>
+                  <td class="p-3"><div class="text-white break-words">${c.text}</div><div class="text-[9px] text-gray-600 mt-1">@ ${title} - Ep ${c.ep}</div></td>
                   <td class="p-3 text-right whitespace-nowrap">
                       <button onclick="execBanUser('${c.user}')" class="bg-black text-white border border-gray-700 px-2 py-1 rounded text-[10px] hover:bg-gray-800 mr-1">🚫 BAN</button>
                       <button onclick="execDeleteChat('${c.id}')" class="bg-red-900/40 text-red-400 border border-red-900 px-2 py-1 rounded text-[10px] hover:bg-red-900">❌ DEL</button>
                   </td>
-              </tr>
-              `;
+              </tr>`;
           });
       }
 
       function renderBannedUsers() {
           const l = document.getElementById('banned-users-list');
           l.innerHTML = "";
-          if(appData.banned.length === 0) {
-              l.innerHTML = '<li class="p-4 text-center text-gray-500 border border-dashed border-slate-700 rounded">Tidak ada user banned</li>';
-              return;
-          }
-          appData.banned.forEach(u => {
-              l.innerHTML += `<li class="p-3 bg-slate-900 border border-slate-700 rounded flex justify-between items-center"><span class="font-bold text-red-400">${u}</span> <span class="text-[10px] text-gray-600">Terbanned permanen</span></li>`;
-          });
+          if(appData.banned.length === 0) { l.innerHTML = '<li class="p-4 text-center text-gray-500 border border-dashed border-slate-700 rounded">Tidak ada user banned</li>'; return; }
+          appData.banned.forEach(u => { l.innerHTML += `<li class="p-3 bg-slate-900 border border-slate-700 rounded flex justify-between items-center"><span class="font-bold text-red-400">${u}</span> <span class="text-[10px] text-gray-600">Terbanned permanen</span></li>`; });
       }
 
       // --- ACTION FUNCTIONS ---
@@ -369,13 +369,8 @@
           const secretPass = sessionStorage.getItem('admin_secret_temp');
           if(!secretPass) return showReauthPopup(() => execDeleteChat(chatId));
           if(!confirm("Hapus chat ini?")) return;
-
           try {
-              const r = await fetch(`${CONFIG.workerUrl}/api/chat`, {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass },
-                  body: JSON.stringify({ action: "delete", commentId: chatId })
-              });
+              const r = await fetch(`${CONFIG.workerUrl}/api/chat`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ action: "delete", commentId: chatId }) });
               if(r.ok) { fetchChatAdmin(); } else { alert("Gagal hapus"); }
           } catch(e) { alert("Error: " + e.message); }
       }
@@ -384,22 +379,12 @@
           const secretPass = sessionStorage.getItem('admin_secret_temp');
           if(!secretPass) return showReauthPopup(() => execBanUser(username));
           if(!confirm(`BANNED User: ${username}?\nMereka tidak akan bisa chat lagi.`)) return;
-
           try {
-              const r = await fetch(`${CONFIG.workerUrl}/api/users`, {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass },
-                  body: JSON.stringify({ action: "ban", username: username })
-              });
-              if(r.ok) { 
-                  alert(`User ${username} berhasil dibanned.`);
-                  fetchChatAdmin(); // Refresh chat (opsional jika ingin lihat efeknya)
-              } else { alert("Gagal ban user"); }
+              const r = await fetch(`${CONFIG.workerUrl}/api/users`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ action: "ban", username: username }) });
+              if(r.ok) { alert(`User ${username} berhasil dibanned.`); fetchChatAdmin(); } else { alert("Gagal ban user"); }
           } catch(e) { alert("Error: " + e.message); }
       }
 
-
-      // --- (FUNGSI HELPER UI) ---
       function addEpisodeRow(n = "", u = "") { 
           const c = document.getElementById('episode-container'); 
           const d = document.createElement('div'); 
@@ -416,12 +401,31 @@
           c.appendChild(d); 
       }
       function moveEpRow(btn, direction) { const row = btn.closest('.ep-row'); const container = row.parentNode; if (direction === -1 && row.previousElementSibling) container.insertBefore(row, row.previousElementSibling); else if (direction === 1 && row.nextElementSibling) container.insertBefore(row.nextElementSibling, row); }
-      function editData(id) { const i = appData.donghua.find(x => x.id == id); if (!i) return; document.getElementById('edit-id').value = i.id; document.getElementById('inp-title').value = i.title; document.getElementById('inp-img').value = i.image; document.getElementById('inp-desc').value = i.synopsis; document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); if (i.day) i.day.split(',').forEach(d => { const btn = document.querySelector(`.day-select-btn[data-val="${d}"]`); if(btn) btn.classList.add('selected'); }); updateHiddenDayInput(); if (i.scheduledTime) { const d = new Date(i.scheduledTime); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); document.getElementById('inp-schedule-time').value = d.toISOString().slice(0, 16); } else { document.getElementById('inp-schedule-time').value = ""; } const c = document.getElementById('episode-container'); c.innerHTML = ""; (i.episodes || []).forEach(e => addEpisodeRow(e.ep, e.url)); document.getElementById('view-admin-panel').scrollIntoView({ behavior: 'smooth' }); switchTab('anime'); }
-      function clearForm() { document.getElementById('edit-id').value = ""; document.getElementById('inp-title').value = ""; document.getElementById('inp-img').value = ""; document.getElementById('inp-desc').value = ""; document.getElementById('inp-notify-msg').value = ""; document.getElementById('inp-day').value = ""; document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); document.getElementById('inp-schedule-time').value = ""; document.getElementById('episode-container').innerHTML = ""; }
+      
+      function editData(id) { 
+          const i = appData.donghua.find(x => x.id == id); if (!i) return; 
+          document.getElementById('edit-id').value = i.id; 
+          document.getElementById('inp-title').value = i.title; 
+          document.getElementById('inp-type').value = i.type || 'series'; // [BARU] Load tipe
+          document.getElementById('inp-img').value = i.image; 
+          document.getElementById('inp-desc').value = i.synopsis; 
+          document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); 
+          if (i.day) i.day.split(',').forEach(d => { const btn = document.querySelector(`.day-select-btn[data-val="${d}"]`); if(btn) btn.classList.add('selected'); }); 
+          updateHiddenDayInput(); 
+          if (i.scheduledTime) { const d = new Date(i.scheduledTime); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); document.getElementById('inp-schedule-time').value = d.toISOString().slice(0, 16); } else { document.getElementById('inp-schedule-time').value = ""; } 
+          const c = document.getElementById('episode-container'); c.innerHTML = ""; 
+          (i.episodes || []).forEach(e => addEpisodeRow(e.ep, e.url)); 
+          document.getElementById('view-admin-panel').scrollIntoView({ behavior: 'smooth' }); switchTab('anime'); 
+      }
+      
+      function clearForm() { 
+          document.getElementById('edit-id').value = ""; document.getElementById('inp-title').value = ""; document.getElementById('inp-img').value = ""; document.getElementById('inp-desc').value = ""; document.getElementById('inp-notify-msg').value = ""; document.getElementById('inp-day').value = ""; 
+          document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); 
+          document.getElementById('inp-schedule-time').value = ""; document.getElementById('episode-container').innerHTML = ""; 
+      }
       function toggleDaySelection(btn) { btn.classList.toggle('selected'); updateHiddenDayInput(); }
       function updateHiddenDayInput() { const selected = []; document.querySelectorAll('.day-select-btn.selected').forEach(btn => selected.push(btn.getAttribute('data-val'))); document.getElementById('inp-day').value = selected.join(','); }
       
-      // REAUTH & SAVE (CORE)
       function showReauthPopup(callback) { onReauthSuccess = callback; document.getElementById('reauth-msg').innerText = ''; document.getElementById('reauth-modal').classList.remove('hide'); document.getElementById('reauth-pass').focus(); }
       function hideReauthPopup() { document.getElementById('reauth-modal').classList.add('hide'); document.getElementById('reauth-pass').value = ''; }
       async function handleReauth() { const pass = document.getElementById('reauth-pass').value; const btn = document.querySelector('#reauth-modal button[type="submit"]'); btn.disabled = true; btn.innerText = "Cek..."; try { const r = await fetch(`${CONFIG.workerUrl}/api/verify-session`, { method: 'POST', headers: { 'X-Admin-Pass': pass } }); if (r.ok) { sessionStorage.setItem('admin_secret_temp', pass); hideReauthPopup(); if (onReauthSuccess) { const cb = onReauthSuccess; onReauthSuccess = null; cb(); } } else { document.getElementById('reauth-msg').innerText = 'Password salah.'; } } catch (e) { document.getElementById('reauth-msg').innerText = 'Error jaringan.'; } btn.disabled = false; btn.innerText = "Lanjutkan"; }
@@ -432,6 +436,7 @@
           
           const id = document.getElementById('edit-id').value;
           const title = document.getElementById('inp-title').value; if(!title) return alert("Judul wajib");
+          const type = document.getElementById('inp-type').value; // [BARU] Ambil tipe
           const img = document.getElementById('inp-img').value;
           const desc = document.getElementById('inp-desc').value;
           const customMsg = document.getElementById('inp-notify-msg').value;
@@ -441,7 +446,9 @@
           let eps = []; document.querySelectorAll('#episode-container > div').forEach(r => { eps.push({ ep: r.querySelector('.ep-num').value, url: r.querySelector('.ep-url').value }) });
           
           const ts = Date.now(); const isNewEntry = !id; const newItemId = id || ts.toString();
-          let newItem = { id: newItemId, title, image: img, synopsis: desc, day: day, scheduledTime: scheduledTime, episodes: eps, views: 0, lastUpdated: ts };
+          
+          // [BARU] Tambahkan field type ke object
+          let newItem = { id: newItemId, title, type: type, image: img, synopsis: desc, day: day, scheduledTime: scheduledTime, episodes: eps, views: 0, lastUpdated: ts };
           
           const idx = appData.donghua.findIndex(x => x.id == id);
           if (idx > -1) { newItem.views = appData.donghua[idx].views || 0; appData.donghua[idx] = newItem; } else { appData.donghua.push(newItem); }
@@ -456,33 +463,15 @@
           } catch (e) { alert("Error Worker: " + e.message); }
       }
 
-      // --- NEW DELETE FUNCTION (FIXED) ---
       async function deleteData(id) {
           const secretPass = sessionStorage.getItem('admin_secret_temp');
-          
           if (!secretPass) return showReauthPopup(() => deleteData(id));
           if (!confirm("Yakin hapus? Data hilang permanen.")) return;
-
           try {
-              const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, {
-                  method: "DELETE", // Changed from PUT
-                  headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass },
-                  body: JSON.stringify({ id: id }) // Send ID only
-              });
-
-              if (r.ok) {
-                  appData.donghua = appData.donghua.filter(x => x.id != id);
-                  renderAdminList();
-                  alert("Berhasil dihapus!");
-              } else if (r.status === 401) {
-                  showReauthPopup(() => deleteData(id));
-              } else {
-                  alert("Gagal menghapus.");
-              }
+              const r = await fetch(`${CONFIG.workerUrl}/api/donghua`, { method: "DELETE", headers: { "Content-Type": "application/json", "X-Admin-Pass": secretPass }, body: JSON.stringify({ id: id }) });
+              if (r.ok) { appData.donghua = appData.donghua.filter(x => x.id != id); renderAdminList(); alert("Berhasil dihapus!"); } else if (r.status === 401) { showReauthPopup(() => deleteData(id)); } else { alert("Gagal menghapus."); }
           } catch (e) { alert("Error Network: " + e.message); }
       }
-
-      function downloadSitemap() { alert("Sitemap generated"); }
       async function updateAdminCredentials() { alert("Fitur update password admin"); }
   </script>
 </body>
