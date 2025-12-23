@@ -660,7 +660,8 @@
             synImage.alt = i.title; 
             document.getElementById('syn-total-ep-info').innerText = (i.episodes?.length||0)+" Eps"; 
             document.getElementById('syn-views').innerText = (i.views||0)+" Views";
-            // Add Type Badge Logic Here if needed, currently reusing metadata area
+            // FIXED: Set the type label
+            document.getElementById('syn-type-label').innerText = (i.type || 'series') === 'movie' ? 'Movie' : 'Series';
             
             const btnContainer = document.getElementById('synopsis-buttons');
             const isBookmarked = currentUser && (currentUser.bookmarks||[]).includes(id);
