@@ -15,12 +15,10 @@
       .custom-scroll::-webkit-scrollbar { width: 4px; }
       .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
       
-      /* TAB BUTTONS */
       .tab-nav-btn { flex: 1; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; transition: all 0.2s; }
       .tab-nav-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
       .tab-nav-btn:hover { color: #cbd5e1; background: rgba(255,255,255,0.05); }
       
-      /* Dropdown Style agar sama dengan input lain */
       select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 1em; }
   </style>
 </head>
@@ -38,7 +36,6 @@
 
   <main class="container mx-auto p-4 max-w-4xl flex-grow">
       
-      <!-- LOGIN VIEW -->
       <div id="view-admin-login" class="flex justify-center items-center h-[80vh]">
           <div class="bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700 text-center w-full max-w-sm">
               <h2 class="font-bold text-2xl text-red-500 mb-6">Admin Access</h2>
@@ -51,20 +48,16 @@
           </div>
       </div>
 
-      <!-- PANEL DASHBOARD -->
       <div id="view-admin-panel" class="hide">
           
-          <!-- TAB NAVIGATION -->
           <div class="bg-slate-800 rounded-t-lg border-x border-t border-slate-700 flex mb-0 overflow-hidden">
               <button onclick="switchTab('anime')" id="btn-tab-anime" class="tab-nav-btn active">📺 KELOLA ANIME</button>
               <button onclick="switchTab('chat')" id="btn-tab-chat" class="tab-nav-btn">💬 KELOLA CHAT</button>
               <button onclick="switchTab('users')" id="btn-tab-users" class="tab-nav-btn">🚫 BLACKLIST USER</button>
           </div>
 
-          <!-- CONTENT CONTAINER -->
           <div class="bg-slate-800 p-4 rounded-b-lg mb-6 border border-slate-700 min-h-[500px]">
 
-              <!-- TAB 1: ANIME (Original) -->
               <div id="tab-anime">
                   <div class="bg-slate-900 p-4 rounded-lg mb-6 border border-slate-700">
                       <h3 class="font-bold text-red-400 mb-3 text-xs uppercase tracking-wider border-b border-slate-700 pb-2">Ganti Akun Admin</h3>
@@ -75,7 +68,6 @@
                       </div>
                   </div>
 
-                  <!-- FORM INPUT DONGHUA -->
                   <div class="bg-slate-900 p-5 rounded-lg mb-6 border border-slate-700 shadow-xl">
                       <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
                           <h3 class="font-bold text-blue-400 text-sm uppercase tracking-wider">Input / Edit Donghua</h3>
@@ -89,7 +81,6 @@
                           <div class="space-y-3">
                               <input type="text" id="inp-title" placeholder="Judul Anime" class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
                               
-                              <!-- [BARU] Input Tipe (Style disamakan dengan original) -->
                               <select id="inp-type" class="w-full p-2.5 bg-slate-800 rounded border border-slate-600 text-sm text-white focus:border-blue-500 outline-none">
                                   <option value="series">Tipe: Series (Donghua)</option>
                                   <option value="movie">Tipe: Movie</option>
@@ -139,7 +130,6 @@
                       <button onclick="saveDonghua()" class="w-full bg-green-600 py-3 rounded font-bold text-white text-sm hover:bg-green-500 shadow-lg shadow-green-900/20 transition">SIMPAN DATA</button>
                   </div>
 
-                  <!-- TABEL LIST DONGHUA -->
                   <div class="overflow-hidden bg-slate-900 rounded-lg border border-slate-700 shadow-xl">
                       <table class="w-full text-left text-xs text-gray-400">
                           <thead class="bg-slate-800 text-white font-bold uppercase">
@@ -153,9 +143,7 @@
                       </table>
                   </div>
               </div>
-              <!-- END TAB 1 -->
 
-              <!-- TAB 2: LIVE CHAT MANAGEMENT -->
               <div id="tab-chat" class="hide">
                   <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
                       <h3 class="font-bold text-white text-sm">💬 Komentar Terbaru</h3>
@@ -177,9 +165,7 @@
                       </table>
                   </div>
               </div>
-              <!-- END TAB 2 -->
 
-              <!-- TAB 3: BANNED USERS -->
               <div id="tab-users" class="hide">
                   <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
                       <h3 class="font-bold text-white text-sm">🚫 Daftar User Banned</h3>
@@ -192,13 +178,11 @@
                       </ul>
                   </div>
               </div>
-              <!-- END TAB 3 -->
 
           </div>
       </div>
   </main>
 
-  <!-- POPUP RE-AUTH -->
   <div id="reauth-modal" class="hide fixed inset-0 bg-slate-900/90 z-[70] flex items-center justify-center backdrop-blur-sm p-4">
       <div class="bg-slate-800 w-full max-w-sm rounded-xl p-6 border border-slate-700 shadow-2xl">
           <h3 class="font-bold text-white text-lg mb-2">Sesi Berakhir</h3>
@@ -219,13 +203,11 @@
       let appData = { donghua: [], chats: [], banned: [] };
       let onReauthSuccess = null;
 
-      // --- HELPER FUNCTIONS ---
       async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
       async function hashPass(str) { const msgBuffer = new TextEncoder().encode(str); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
       function getLatestEp(eps) { if (!eps || eps.length === 0) return 0; return [...eps].sort((a, b) => parseFloat(b.ep) - parseFloat(a.ep))[0].ep; }
       function timeAgo(ts) { const d=new Date(ts); return `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${d.getMinutes()}`; }
 
-      // --- INIT & AUTH ---
       window.onload = function() {
           if (sessionStorage.getItem('admin_session') === 'active') {
               document.getElementById('view-admin-login').classList.add('hide');
@@ -266,7 +248,6 @@
           location.reload();
       }
 
-      // --- TAB NAVIGATION ---
       function switchTab(tabName) {
           document.getElementById('tab-anime').classList.add('hide');
           document.getElementById('tab-chat').classList.add('hide');
@@ -278,7 +259,6 @@
           if(tabName === 'users') fetchBannedUsers();
       }
 
-      // --- FETCH DATA ---
       async function fetchDataForAdmin() {
           const secretPass = sessionStorage.getItem('admin_secret_temp');
           try {
@@ -311,7 +291,6 @@
           } catch(e) { l.innerHTML = '<li class="p-2 text-center text-red-500">Gagal load user</li>'; }
       }
 
-      // --- RENDERERS ---
       function renderAdminList() {
           const t = document.getElementById('admin-list'); 
           t.innerHTML = ""; 
@@ -364,7 +343,6 @@
           appData.banned.forEach(u => { l.innerHTML += `<li class="p-3 bg-slate-900 border border-slate-700 rounded flex justify-between items-center"><span class="font-bold text-red-400">${u}</span> <span class="text-[10px] text-gray-600">Terbanned permanen</span></li>`; });
       }
 
-      // --- ACTION FUNCTIONS ---
       async function execDeleteChat(chatId) {
           const secretPass = sessionStorage.getItem('admin_secret_temp');
           if(!secretPass) return showReauthPopup(() => execDeleteChat(chatId));
@@ -406,7 +384,7 @@
           const i = appData.donghua.find(x => x.id == id); if (!i) return; 
           document.getElementById('edit-id').value = i.id; 
           document.getElementById('inp-title').value = i.title; 
-          document.getElementById('inp-type').value = i.type || 'series'; // [BARU] Load tipe
+          document.getElementById('inp-type').value = i.type || 'series';
           document.getElementById('inp-img').value = i.image; 
           document.getElementById('inp-desc').value = i.synopsis; 
           document.querySelectorAll('.day-select-btn').forEach(btn => btn.classList.remove('selected')); 
@@ -436,7 +414,7 @@
           
           const id = document.getElementById('edit-id').value;
           const title = document.getElementById('inp-title').value; if(!title) return alert("Judul wajib");
-          const type = document.getElementById('inp-type').value; // [BARU] Ambil tipe
+          const type = document.getElementById('inp-type').value;
           const img = document.getElementById('inp-img').value;
           const desc = document.getElementById('inp-desc').value;
           const customMsg = document.getElementById('inp-notify-msg').value;
@@ -447,7 +425,6 @@
           
           const ts = Date.now(); const isNewEntry = !id; const newItemId = id || ts.toString();
           
-          // [BARU] Tambahkan field type ke object
           let newItem = { id: newItemId, title, type: type, image: img, synopsis: desc, day: day, scheduledTime: scheduledTime, episodes: eps, views: 0, lastUpdated: ts };
           
           const idx = appData.donghua.findIndex(x => x.id == id);
