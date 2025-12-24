@@ -1,14 +1,11 @@
-// File: functions/_middleware.js
-// VERSI FINAL DENGAN PERBAIKAN BERDASARKAN LOG ERROR
 
-// Handler sederhana untuk menghapus elemen
 class RemoveHandler {
   element(element) {
     element.remove();
   }
 }
 
-// Handler untuk mengubah isi <title>
+
 class TitleHandler {
   constructor(title) {
     this.title = title;
@@ -18,7 +15,7 @@ class TitleHandler {
   }
 }
 
-// Handler untuk menambahkan semua meta tag baru ke <head>
+
 class HeadHandler {
   constructor(metaData) {
     this.meta = metaData;
@@ -82,7 +79,7 @@ export async function onRequest(context) {
       const remover = new RemoveHandler();
 
       return new HTMLRewriter()
-        // 1. Hapus semua tag meta default yang relevan
+
         .on('meta[name="description"]', remover)
         .on('meta[property="og:title"]', remover)
         .on('meta[property="og:description"]', remover)
@@ -91,10 +88,10 @@ export async function onRequest(context) {
         .on('meta[property="og:type"]', remover)
         .on('meta[name="twitter:card"]', remover)
         
-        // 2. Ubah isi <title>
+
         .on('title', new TitleHandler(metaData.title))
         
-        // 3. Tambahkan semua tag meta baru ke <head>
+
         .on('head', new HeadHandler(metaData))
 
         .transform(response);
