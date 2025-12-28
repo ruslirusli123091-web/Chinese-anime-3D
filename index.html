@@ -95,9 +95,9 @@
         /* CSS POSISI TOMBOL KELUAR DI POJOK KANAN BAWAH */
         .rotate-active {
             position: fixed;
-            top: auto;        /* Atas dinonaktifkan */
-            bottom: 50px;     /* Pindah ke Bawah (sesuai arah panah) */
-            right: 20px;      /* Tetap di kanan */
+            top: auto;
+            bottom: 100px;    
+            right: -15px; 
             left: auto;  
             background: #dc2626;
             border-color: #ef4444;
@@ -106,6 +106,8 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.8);
             padding: 8px 16px;
             border-radius: 50px;
+            transform: rotate(90deg); 
+            transform-origin: center;
          }
 
         .forced-landscape {
