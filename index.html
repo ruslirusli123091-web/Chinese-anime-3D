@@ -102,6 +102,22 @@
          padding: 8px 16px;
          border-radius: 50px;
          }
+        .forced-landscape {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vh !important;
+        height: 100vw !important;
+        z-index: 99999 !important;
+        background: #000 !important;
+        transform-origin: top left !important;
+        transform: rotate(90deg) translateY(-100%) !important;
+        aspect-ratio: unset !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        }
         .watch-info { margin-bottom: 20px; padding: 0 4px; }
         .watch-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .watch-title { font-size: 14px; font-weight: bold; color: white; line-height: 1.4; flex: 1; }
