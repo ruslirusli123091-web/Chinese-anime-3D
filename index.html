@@ -151,7 +151,7 @@
 
     <header>
         <a href="/" onclick="event.preventDefault(); navigateTo('/');" class="logo" aria-label="Ke Beranda">
-            <img src="logo.png" alt="CA3D Logo" width="107" height="40" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <img src="https://wsrv.nl/?url=https://ca3d.site/logo.png&w=200&output=webp&q=50" alt="CA3D Logo" width="107" height="40" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" loading="eager" fetchpriority="high">
             <span style="display:none; font-weight:900; font-style:italic; font-size:18px; color:var(--primary);">CA3D</span>
         </a>
         <div class="search-box">
@@ -352,7 +352,7 @@
                 return url;
             }
             const cleanUrl = url.replace(/^https?:\/\//, '');
-            return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${width}&q=60&output=webp`;
+            return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${width}&q=50&output=webp`;
         }
         
         async function hashString(str) { const msgBuffer = new TextEncoder().encode(str.toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
