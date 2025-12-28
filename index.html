@@ -88,7 +88,20 @@
         .btn-server { font-size: 11px; padding: 6px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 4px; color: #ccc; white-space: nowrap; }
         .btn-server.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
         .btn-rotate { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 10px; border-radius: 4px; font-size: 11px; display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        .rotate-active { position: fixed; top: 20px; left: 20px; background: #dc2626; border-color: #ef4444; transform: rotate(90deg); z-index: 100000; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
+        .rotate-active {
+         position: fixed;
+         top: 20px;
+         right: 20px; 
+         left: auto;  
+         background: #dc2626;
+         border-color: #ef4444;
+         color: white;
+    
+         z-index: 100000;
+         box-shadow: 0 0 15px rgba(0,0,0,0.8);
+         padding: 8px 16px;
+         border-radius: 50px;
+         }
         .forced-landscape { position: fixed !important; top: 50% !important; left: 50% !important; width: 100dvh !important; height: 100vw !important; z-index: 99999 !important; background: #000 !important; transform: translate(-50%, -50%) rotate(90deg) !important; margin: 0 !important; padding: 0 !important; }
         .watch-info { margin-bottom: 20px; padding: 0 4px; }
         .watch-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
