@@ -2,8 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin.html
-Disallow: /sitemap.html
-Disallow: /sitemap-gen
-Disallow: /api/admin/
 Sitemap: https://ca3d.site/sitemap.xml
+
 
