@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TAMBAHAN PENTING: viewport-fit=cover agar menembus Poni HP -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Chinese Anime 3D - Nonton Donghua Sub Indo</title>
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
     <meta name="theme-color" content="#0f172a">
@@ -25,7 +26,6 @@
         button { border: none; background: none; color: inherit; cursor: pointer; font-family: inherit; }
         .hide { display: none !important; }
         
-        /* PENTING: contain: content dihapus agar video bisa fixed fullscreen dengan benar */
         .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
         
         header { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid #1e293b; height: 64px; display: flex; align-items: center; padding: 0 16px; gap: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
@@ -92,52 +92,56 @@
         .btn-server.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
         .btn-rotate { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 10px; border-radius: 4px; font-size: 11px; display: flex; align-items: center; gap: 5px; font-weight: bold; }
         
-        /* CSS POSISI TOMBOL KELUAR DI POJOK KANAN BAWAH */
-        .rotate-active {
-            position: fixed;
-            top: auto;
-            bottom: 100px;    
-            right: -15px; 
-            left: auto;  
-            background: #dc2626;
-            border-color: #ef4444;
-            color: white;
-            z-index: 100000;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
-            padding: 8px 16px;
-            border-radius: 50px;
-            transform: rotate(90deg); 
-            transform-origin: center;
-         }
-
+        /* --- CSS DARI BAPAK (FULL SCREEN & PONI) --- */
         .forced-landscape {
-            position: fixed !important;
-            top: 50% !important;     
-            left: 50% !important;    
+            position: fixed !important; 
+            top: 50% !important; 
+            left: 50% !important;
             width: 100vh !important; 
             height: 100vw !important;
-            z-index: 99999 !important;
-            background: #000 !important;
-            
-            transform: translate(-50%, -50%) rotate(90deg) !important;
-            transform-origin: center center !important;
-            
-            aspect-ratio: unset !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            margin: 0 !important;
+            max-width: none !important; 
+            max-height: none !important; 
+            margin: 0 !important; 
             padding: 0 !important;
-            overflow: hidden !important;
+            background: #000 !important; 
+            z-index: 2147483647 !important;
+            /* Putar 90 Derajat */
+            transform: translate(-50%, -50%) rotate(90deg) !important; 
+            transform-origin: center center !important;
         }
-
-        .forced-landscape iframe {
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            border: none !important;
+        
+        /* Iframe mengikuti pembungkusnya */
+        .forced-landscape iframe { 
+            width: 100% !important; 
+            height: 100% !important; 
+            position: absolute !important; 
+            top: 0 !important; 
+            left: 0 !important; 
         }
+        
+        /* Tombol Keluar (Muncul saat landscape) */
+        .btn-exit-landscape {
+            display: none; /* Sembunyi saat normal */
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+            background: rgba(220, 38, 38, 0.8); /* Merah Transparan */
+            color: #fff; 
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            cursor: pointer;
+            z-index: 2147483648; 
+            backdrop-filter: blur(4px);
+            font-size: 12px;
+        }
+        
+        /* Tampilkan tombol saat class .forced-landscape aktif */
+        .forced-landscape .btn-exit-landscape { 
+            display: block; 
+        }
+        /* --- SELESAI CSS DARI BAPAK --- */
 
         .watch-info { margin-bottom: 20px; padding: 0 4px; }
         .watch-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
@@ -269,6 +273,9 @@
                 <div class="lg-main">
                     <div class="video-wrapper" id="video-container">
                         <iframe id="video-player" title="Video Player" src="" allowfullscreen></iframe>
+                        
+                        <!-- TOMBOL KELUAR DI DALAM VIDEO WRAPPER (Agar ikut berputar) -->
+                        <button class="btn-exit-landscape" onclick="toggleLandscape()">✖ Keluar</button>
                     </div>
                     
                     <div class="server-bar">
@@ -810,23 +817,16 @@
                 resetLandscapeMode();
             } else {
                 c.classList.add('forced-landscape');
-                b.classList.add('rotate-active');
-                b.innerHTML = `<span>✖</span> Keluar`;
                 
-                // Mencegah scroll saat mode layar penuh aktif
+                // Matikan scroll saat mode layar penuh aktif
                 document.body.style.overflow = 'hidden';
             }
         }
 
         function resetLandscapeMode() {
             const c = document.getElementById('video-container');
-            const b = document.getElementById('btn-rotate-toggle');
             
             if (c) c.classList.remove('forced-landscape');
-            if (b) {
-                b.classList.remove('rotate-active');
-                b.innerHTML = `<span>⟳</span> Putar`;
-            }
             
             // Mengembalikan scroll saat kembali ke mode normal
             document.body.style.overflow = '';
