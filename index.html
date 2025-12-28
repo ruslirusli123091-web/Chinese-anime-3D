@@ -88,36 +88,54 @@
         .btn-server { font-size: 11px; padding: 6px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 4px; color: #ccc; white-space: nowrap; }
         .btn-server.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
         .btn-rotate { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 10px; border-radius: 4px; font-size: 11px; display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        .rotate-active {
-         position: fixed;
-         top: 20px;
-         right: 20px; 
-         left: auto;  
-         background: #dc2626;
-         border-color: #ef4444;
-         color: white;
+        
     
-         z-index: 100000;
-         box-shadow: 0 0 15px rgba(0,0,0,0.8);
-         padding: 8px 16px;
-         border-radius: 50px;
+        .rotate-active {
+            position: fixed;
+            top: 20px;
+            right: 20px; 
+            left: auto;  
+            background: #dc2626;
+            border-color: #ef4444;
+            color: white;
+            z-index: 100000;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            padding: 8px 16px;
+            border-radius: 50px;
          }
+
         .forced-landscape {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vh !important;
-        height: 100vw !important;
-        z-index: 99999 !important;
-        background: #000 !important;
-        transform-origin: top left !important;
-        transform: rotate(90deg) translateY(-100%) !important;
-        aspect-ratio: unset !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
+            position: fixed !important;
+            top: 50% !important;     
+            left: 50% !important;    
+            width: 100vh !important; 
+            height: 100vw !important;
+            z-index: 99999 !important;
+            background: #000 !important;
+            
+           
+            transform: translate(-50%, -50%) rotate(90deg) !important;
+            transform-origin: center center !important;
+            
+            aspect-ratio: unset !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
         }
+
+     
+        .forced-landscape iframe {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            border: none !important;
+        }
+      
+
         .watch-info { margin-bottom: 20px; padding: 0 4px; }
         .watch-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .watch-title { font-size: 14px; font-weight: bold; color: white; line-height: 1.4; flex: 1; }
@@ -781,8 +799,37 @@
         document.addEventListener('click', e=>{if(!e.target.closest('.search-box'))document.getElementById('search-results').classList.add('hide')});
         function showShare(id,ep,title){ const url=`${CONFIG.workerUrl}/share?id=${id}${ep?'&ep='+ep:''}`, txt=ep?`Nonton ${title} Episode ${ep}`:`Nonton ${title}`; navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?page=${ep?'watch':'synopsis'}&id=${id}${ep?'&ep='+ep:''}`).then(()=>alert("Link tersalin")).catch(()=>{}); window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(txt)}`,'_blank'); }
     
-        function toggleLandscape() { const c=document.getElementById('video-container'), b=document.getElementById('btn-rotate-toggle'); if(c.classList.contains('forced-landscape')){ resetLandscapeMode(); } else { c.classList.add('forced-landscape'); b.classList.add('rotate-active'); b.innerHTML=`<span>✖</span> Keluar`; } }
-        function resetLandscapeMode() { const c=document.getElementById('video-container'), b=document.getElementById('btn-rotate-toggle'); if(c) c.classList.remove('forced-landscape'); if(b) { b.classList.remove('rotate-active'); b.innerHTML=`<span>⟳</span> Putar`; } }
+        /* --- PERBAIKAN ROTASI JS --- */
+        function toggleLandscape() {
+            const c = document.getElementById('video-container');
+            const b = document.getElementById('btn-rotate-toggle');
+            
+            if (c.classList.contains('forced-landscape')) {
+                resetLandscapeMode();
+            } else {
+                c.classList.add('forced-landscape');
+                b.classList.add('rotate-active');
+                b.innerHTML = `<span>✖</span> Keluar`;
+                
+                
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function resetLandscapeMode() {
+            const c = document.getElementById('video-container');
+            const b = document.getElementById('btn-rotate-toggle');
+            
+            if (c) c.classList.remove('forced-landscape');
+            if (b) {
+                b.classList.remove('rotate-active');
+                b.innerHTML = `<span>⟳</span> Putar`;
+            }
+            
+           
+            document.body.style.overflow = '';
+        }
+     
         
         let deferredPrompt;
         const popup = document.getElementById('pwa-popup');
