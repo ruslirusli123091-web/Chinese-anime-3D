@@ -760,5 +760,68 @@
         function toggleLandscape() { const c=document.getElementById('video-container'), b=document.getElementById('btn-rotate-toggle'); if(c.classList.contains('forced-landscape')){ resetLandscapeMode(); } else { c.classList.add('forced-landscape'); b.classList.add('rotate-active'); b.innerHTML=`<span>✖</span> Keluar`; } }
         function resetLandscapeMode() { const c=document.getElementById('video-container'), b=document.getElementById('btn-rotate-toggle'); if(c) c.classList.remove('forced-landscape'); if(b) { b.classList.remove('rotate-active'); b.innerHTML=`<span>⟳</span> Putar`; } }
     </script>
+
+    <style>
+        .app-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(12px); border: 1px solid #334155; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popUpAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .app-popup.hide { display: none !important; }
+        .app-icon { width: 45px; height: 45px; border-radius: 8px; flex-shrink: 0; }
+        .app-content { flex: 1; }
+        .app-title { font-size: 13px; font-weight: bold; color: white; line-height: 1.2; margin-bottom: 2px; }
+        .app-desc { font-size: 11px; color: #94a3b8; }
+        .btn-app-install { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-app-close { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        @keyframes popUpAnim { from { transform: translate(-50%, 50px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    </style>
+
+    <div id="pwa-popup" class="app-popup hide">
+        <button onclick="closeAppPopup()" class="btn-app-close">✕</button>
+        <img src="https://ca3d.site/web-app-manifest-192x192.png" onerror="this.src='logo.png'" alt="App Icon" class="app-icon">
+        <div class="app-content">
+            <div class="app-title">Install Aplikasi CA3D</div>
+            <div class="app-desc">Nonton lebih lancar & hemat kuota!</div>
+        </div>
+        <button id="btn-pwa-install" class="btn-app-install">INSTALL</button>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        const popup = document.getElementById('pwa-popup');
+        
+       
+        const isClosed = localStorage.getItem('pwa_popup_closed');
+        const now = new Date().getTime();
+        
+     
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+           
+            if (!isClosed || (now - isClosed > 86400000)) { 
+                setTimeout(() => popup.classList.remove('hide'), 3000); 
+            }
+        });
+
+        
+        if (!deferredPrompt && (!isClosed || (now - isClosed > 86400000))) {
+             setTimeout(() => popup.classList.remove('hide'), 4000);
+        }
+
+        document.getElementById('btn-pwa-install').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') closeAppPopup();
+                deferredPrompt = null;
+            } else {
+                alert("Silakan 'Add to Home Screen' melalui menu browser Anda.");
+                closeAppPopup();
+            }
+        });
+
+        function closeAppPopup() {
+            popup.classList.add('hide');
+            localStorage.setItem('pwa_popup_closed', new Date().getTime());
+        }
+    </script>
 </body>
 </html>
