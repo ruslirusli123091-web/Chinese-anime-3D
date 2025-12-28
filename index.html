@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- TAMBAHAN PENTING: viewport-fit=cover agar menembus Poni HP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Chinese Anime 3D - Nonton Donghua Sub Indo</title>
     <meta name="description" content="Nonton streaming Chinese Anime 3D (Donghua) terbaru dengan subtitle Indonesia.">
@@ -91,8 +90,6 @@
         .btn-server { font-size: 11px; padding: 6px 12px; background: #1e293b; border: 1px solid #334155; border-radius: 4px; color: #ccc; white-space: nowrap; }
         .btn-server.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
         .btn-rotate { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 10px; border-radius: 4px; font-size: 11px; display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        
-        /* --- CSS DARI BAPAK (FULL SCREEN & PONI) --- */
         .forced-landscape {
             position: fixed !important; 
             top: 50% !important; 
@@ -105,12 +102,9 @@
             padding: 0 !important;
             background: #000 !important; 
             z-index: 2147483647 !important;
-            /* Putar 90 Derajat */
             transform: translate(-50%, -50%) rotate(90deg) !important; 
             transform-origin: center center !important;
         }
-        
-        /* Iframe mengikuti pembungkusnya */
         .forced-landscape iframe { 
             width: 100% !important; 
             height: 100% !important; 
@@ -118,14 +112,12 @@
             top: 0 !important; 
             left: 0 !important; 
         }
-        
-        /* Tombol Keluar (Muncul saat landscape) */
         .btn-exit-landscape {
-            display: none; /* Sembunyi saat normal */
+            display: none;
             position: absolute; 
             top: 20px; 
             right: 20px;
-            background: rgba(220, 38, 38, 0.8); /* Merah Transparan */
+            background: rgba(220, 38, 38, 0.8); 
             color: #fff; 
             border: 1px solid rgba(255,255,255,0.3);
             padding: 8px 15px; 
@@ -136,13 +128,9 @@
             backdrop-filter: blur(4px);
             font-size: 12px;
         }
-        
-        /* Tampilkan tombol saat class .forced-landscape aktif */
         .forced-landscape .btn-exit-landscape { 
             display: block; 
         }
-        /* --- SELESAI CSS DARI BAPAK --- */
-
         .watch-info { margin-bottom: 20px; padding: 0 4px; }
         .watch-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .watch-title { font-size: 14px; font-weight: bold; color: white; line-height: 1.4; flex: 1; }
@@ -818,7 +806,6 @@
             } else {
                 c.classList.add('forced-landscape');
                 
-                // Matikan scroll saat mode layar penuh aktif
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -828,7 +815,6 @@
             
             if (c) c.classList.remove('forced-landscape');
             
-            // Mengembalikan scroll saat kembali ke mode normal
             document.body.style.overflow = '';
         }
         
