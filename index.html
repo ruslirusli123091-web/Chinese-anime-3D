@@ -52,7 +52,13 @@
         .section-title { font-size: 16px; font-weight: bold; margin-bottom: 16px; border-left: 4px solid var(--primary); padding-left: 10px; display: flex; align-items: center; }
         .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; contain: content; }
         @media (min-width: 640px) { .movie-grid { grid-template-columns: repeat(4, 1fr); } .banner-title { font-size: 2rem; } }
-        @media (min-width: 1024px) { .movie-grid { grid-template-columns: repeat(6, 1fr); gap: 16px; } }
+        @media (min-width: 1024px) { 
+            .movie-grid { grid-template-columns: repeat(6, 1fr); gap: 16px; } 
+            /* Pengaturan agar layout watch page melebar di desktop seperti synopsis */
+            .lg-flex { display: flex; flex-direction: column; gap: 20px; }
+            .lg-main { width: 100%; }
+            .lg-sidebar { width: 100%; }
+        }
         .movie-card { position: relative; border-radius: 8px; overflow: hidden; background: #1e293b; aspect-ratio: 2/3; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); transition: transform 0.2s; cursor: pointer; contain: paint; }
         .movie-card:hover { transform: scale(1.03); z-index: 2; }
         .movie-card img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 2/3; display: block; }
@@ -79,7 +85,11 @@
         .ep-list-header { font-size: 12px; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
         .ep-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; max-height: 250px; overflow-y: auto; padding-right: 4px; }
         .ep-grid-watch-page { grid-template-columns: repeat(7, 1fr); }
-        @media (min-width: 1024px) { .ep-grid { grid-template-columns: repeat(20, 1fr); } .ep-grid-watch-page { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1024px) { 
+            /* Grid episode di synopsis dan watch page menjadi 20 kolom */
+            .ep-grid { grid-template-columns: repeat(20, 1fr); } 
+            .ep-grid-watch-page { grid-template-columns: repeat(20, 1fr); } 
+        }
         .btn-ep { background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; transition: 0.2s; }
         .btn-ep:hover { background: #334155; color: white; }
         .btn-ep.active { background: var(--primary); color: white; border-color: #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
@@ -139,7 +149,7 @@
         .btn-icon:hover { color: white; }
         .btn-icon.loved { color: var(--pink-love); }
         .ep-sidebar-box { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 12px; padding: 16px; margin-bottom: 40px; }
-        .chat-box { background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; }
+        .chat-box { background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 20px;}
         .chat-header { font-size: 12px; font-weight: bold; margin-bottom: 10px; color: white; }
         .chat-messages { height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 5px; }
         .chat-bubble { font-size: 12px; }
@@ -295,6 +305,7 @@
                 <div class="lg-sidebar">
                     <div class="ep-sidebar-box">
                         <h2 class="ep-list-header">PILIH EPISODE</h2>
+                        <!-- Grid episode di sini sekarang menjadi 20 kolom di desktop -->
                         <div id="watch-ep-list" class="ep-grid ep-grid-watch-page" style="max-height: 400px;"></div>
                     </div>
                     <div>
